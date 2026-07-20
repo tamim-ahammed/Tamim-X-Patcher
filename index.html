@@ -600,34 +600,51 @@
             });
         }
 
-        // 5. REAL-TIME COUNTER LOGIC
-        const USERNAME = 'tamim_patcher';
+        // 5. REAL-TIME COUNTER LOGIC (UNIQUE VISITORS)
+const USERNAME = 'tamim_patcher';
 
-        // ভিজিটর কাউন্ট পড়া
-        fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors/up`)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.count) document.getElementById('visitor-count').innerText = data.count;
-            })
-            .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
+// চেক করা হচ্ছে ইউজার আগে ভিজিট করেছে কিনা
+if (!localStorage.getItem('visited_' + USERNAME)) {
+    // প্রথমবার ভিজিট করলে কাউন্ট ১ বাড়াবে
+    fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors/up`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.count) {
+                document.getElementById('visitor-count').innerText = data.count;
+            }
+            // ব্রাউজারে মার্ক করে রাখা হলো যে ইউজার ভিজিট করেছে
+            localStorage.setItem('visited_' + USERNAME, 'true');
+        })
+        .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
+} else {
+    // আগের ভিজিটর হলে শুধু বর্তমান সংখ্যাটি নিয়ে এসে দেখাবে (বাড়াবে না)
+    fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.count) {
+                document.getElementById('visitor-count').innerText = data.count;
+            }
+        })
+        .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
+}
 
-        // রেন্ডার সংখ্যা পড়া
-        fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders`)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.count) document.getElementById('render-count').innerText = data.count;
-                else document.getElementById('render-count').innerText = '0';
-            })
-            .catch(() => { document.getElementById('render-count').innerText = '0'; });
+// রেন্ডার সংখ্যা পড়া
+fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders`)
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.count) document.getElementById('render-count').innerText = data.count;
+        else document.getElementById('render-count').innerText = '0';
+    })
+    .catch(() => { document.getElementById('render-count').innerText = '0'; });
 
-        // রেন্ডার সফল হলে কাউন্ট বাড়ানো
-        function incrementRenderCount() {
-            fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders/up`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.count) document.getElementById('render-count').innerText = data.count;
-                });
-        }
+// রেন্ডার সফল হলে কাউন্ট বাড়ানো
+function incrementRenderCount() {
+    fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders/up`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.count) document.getElementById('render-count').innerText = data.count;
+        });
+}
     </script>
 </body>
 </html>
