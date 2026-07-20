@@ -17,97 +17,93 @@
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: #030712;
-            color: #e2e8f0;
-            overflow-x: hidden;
-        }
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+        background-color: #030712;
+        color: #e2e8f0;
+        overflow-x: hidden;
+    }
+    .mono {
+        font-family: 'JetBrains Mono', monospace;
+    }
 
-        /* Glassy Aurora Background Canvas */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-        }
+    /* 🌌 Dynamic Glassy Background Canvas */
+    #bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        pointer-events: none;
+    }
 
-        /* Premium Glassmorphism UI Card */
-        .glass-card {
-            background: rgba(17, 24, 39, 0.45);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
+    /* 💎 Premium Frosted Glassy Screen Effect */
+    .glass-card {
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    }
 
-        /* Method Section Rounded Borders & Smooth Animations */
-        .method-card {
-            border-radius: 1.25rem; /* Round Border */
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+    /* 🚨 Neon Light & Smooth Hover Animation for Method Cards */
+    .method-card {
+        border-radius: 1rem; /* Rounded Border */
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
 
-        /* Smooth Hover Effects */
-        .method-card:hover {
-            transform: translateY(-5px) scale(1.01);
-            border-color: rgba(239, 68, 68, 0.5);
-            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.3), 0 0 15px rgba(239, 68, 68, 0.15);
-        }
+    /* Neon Hover State */
+    .method-card:hover {
+        transform: translateY(-5px) scale(1.015);
+        border-color: #ef4444 !important; /* Red Neon Border */
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 
+                    inset 0 0 10px rgba(239, 68, 68, 0.2); /* Red Neon Glow Effect */
+    }
 
-        /* Active Glow State */
-        .method-card-active {
-            border-color: rgba(239, 68, 68, 0.8) !important;
-            background: rgba(239, 68, 68, 0.08) !important;
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3), inset 0 0 15px rgba(239, 68, 68, 0.05) !important;
-        }
+    /* Active Neon Glow State */
+    .method-card-active {
+        border-color: #06b6d4 !important; /* Cyan Neon Border */
+        background: rgba(6, 182, 212, 0.08) !important;
+        box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), 
+                    inset 0 0 15px rgba(6, 182, 212, 0.15) !important; /* Cyan Neon Glow */
+    }
 
-        .glow-logo {
-            box-shadow: 0 0 35px rgba(239, 68, 68, 0.4);
-        }
+    /* Neon Light Glow Effect for Logo & Buttons */
+    .glow-logo {
+        box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+    }
 
-        .step-connector {
-            position: absolute;
-            left: 20px;
-            top: 40px;
-            bottom: -30px;
-            width: 2px;
-            background: rgba(255, 255, 255, 0.08);
-            z-index: 0;
-        }
+    .step-connector {
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        bottom: -30px;
+        width: 2px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 0;
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
+    /* UI Keyframe Animations */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
 
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 0.4; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .animate-pulse-ring {
-            animation: pulse-ring 3s infinite ease-in-out;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(1000%); }
-        }
-        .animate-scanline {
-            animation: scanline 3s linear infinite;
-        }
-    </style>
+    @keyframes pulse-ring {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 0.4; }
+        100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-pulse-ring {
+        animation: pulse-ring 3s infinite ease-in-out;
+    }
+</style>
 </head>
 <body class="min-h-screen relative">
 
@@ -275,44 +271,52 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // 1. GLASSY AURORA BACKGROUND ANIMATION
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        // 🌌 Glassy Screen Aurora Light Animation
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
 
-        let particles = [];
-        for (let i = 0; i < 25; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 80 + 40,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
-                color: Math.random() > 0.5 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(56, 189, 248, 0.08)'
-            });
-        }
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-        function drawBackground() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < -100 || p.x > canvas.width + 100) p.vx *= -1;
-                if (p.y < -100 || p.y > canvas.height + 100) p.vy *= -1;
+let orbs = [];
+for (let i = 0; i < 6; i++) {
+    orbs.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 200 + 150,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        color: i % 2 === 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)' // Red & Cyan Neon Orbs
+    });
+}
 
-                let gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-                gradient.addColorStop(0, p.color);
-                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+function drawBackground() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
-                ctx.fill();
-            });
-            requestAnimationFrame(drawBackground);
-        }
-        drawBackground();
+    orbs.forEach(orb => {
+        orb.x += orb.vx;
+        orb.y += orb.vy;
+
+        if (orb.x < -150 || orb.x > canvas.width + 150) orb.vx *= -1;
+        if (orb.y < -150 || orb.y > canvas.height + 150) orb.vy *= -1;
+
+        let gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
+        gradient.addColorStop(0, orb.color);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.beginPath();
+        ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    });
+
+    requestAnimationFrame(drawBackground);
+}
+drawBackground();
 
         // 2. INTRO ANIMATION
         window.addEventListener('DOMContentLoaded', () => {
