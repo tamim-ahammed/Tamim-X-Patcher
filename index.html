@@ -3,21 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamim X Patcher Studio</title>
+    <title>TAMIM X PATCHER - STUDIO</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* 1. DOT GRID BACKGROUND (হুবহু স্ক্রিনশটের মতো) */
+        .bg-grid-dots {
+            background-color: #030712;
+            background-image: radial-gradient(rgba(239, 68, 68, 0.25) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* 2. LOGO CARD & GLOW ANIMATION */
+        .logo-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+        }
+
+        .logo-glow {
+            position: absolute;
+            inset: -10px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(239, 68, 68, 0.3) 50%, transparent 70%);
+            border-radius: 32px;
+            filter: blur(15px);
+            animation: pulseGlow 3s infinite alternate ease-in-out;
+        }
+
+        .logo-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 28px;
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+
+        /* 3. GLASS CARD & CONNECTORS */
         .glass-card {
             background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
         .method-card-active {
             border-color: rgba(6, 182, 212, 0.8) !important;
             background: rgba(6, 182, 212, 0.1) !important;
             box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
         }
+
         .step-connector {
             position: absolute;
             left: 19px;
@@ -27,42 +66,84 @@
             background: linear-gradient(to bottom, rgba(6, 182, 212, 0.5), rgba(255, 255, 255, 0.05));
             z-index: 0;
         }
+
         .mono { font-family: monospace; }
+
+        /* 4. KEYFRAME ANIMATIONS */
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
         .intro-exit {
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.8s ease-in-out;
+            transform: scale(1.05);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body class="bg-[#030712] text-slate-100 min-h-screen relative overflow-x-hidden">
+<body class="bg-grid-dots text-slate-100 min-h-screen relative overflow-x-hidden">
 
-    <!-- CANVAS BACKGROUND -->
-    <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+    <!-- INTRO LOADING SCREEN (EXACTLY MATCHED WITH SCREENSHOT) -->
+    <div id="intro-screen" class="fixed inset-0 bg-[#030712]/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-4 transition-all duration-700">
+        <div class="space-y-8 text-center max-w-xs w-full flex flex-col items-center">
+            
+            <!-- ANIMATED LOGO WITH AMBIENT GLOW -->
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <div class="logo-box flex items-center justify-center p-2">
+                    <img src="https://cdn5.telesco.pe/file/JNi5mGCwGJTuB5w3cKGgU0S8DcUH_a57wr47Itadvc-DRp26cyl-QcIb-aWKkounYzgM4cbS_l1CfuT20xvHG7i0hjefuZ9iP0WInORf5KzDHEVcgueYABYtRrdREZdWJExFrgINMKk5q6NBEhJIFfAwb3FiMWTNBxCKX3DusuE7V61dfrR9u80QMDC0aYXxbm-DdAHqT68lumfBM6gn7N17Pjf56hHNDtF-E3sMo5KVodx6cC58CZAFRS9B-9H-JPpTI8VRchkCULJE602qRqfp4h8gTJb4R0FEI1zrRWPSnwfMc8zO2A-xMWb4di8l5SDKatKMyhxwouACKnCOPg.jpg" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAMIM';" alt="Logo" class="w-full h-full object-cover rounded-2xl">
+                </div>
+            </div>
 
-    <!-- INTRO LOADING SCREEN -->
-    <div id="intro-screen" class="fixed inset-0 bg-[#030712] z-50 flex flex-col items-center justify-center p-4 transition-all duration-700">
-        <div class="space-y-6 text-center max-w-sm w-full">
-            <h1 class="text-2xl font-bold tracking-widest text-cyan-400 mono">TAMIM X PATCHER</h1>
-            <div class="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden border border-white/10 p-0.5">
-                <div id="intro-bar" class="bg-gradient-to-r from-cyan-500 to-red-500 h-full rounded-full w-0 transition-all duration-100"></div>
+            <!-- NAME & TITLE -->
+            <div class="space-y-1">
+                <h1 class="text-2xl font-black tracking-widest text-slate-100 mono uppercase">
+                    TAMIM <span class="text-slate-400">X</span> <span class="text-red-500">PATCHER</span>
+                </h1>
+                <p id="loading-status-text" class="text-[11px] font-bold text-cyan-400/90 tracking-widest mono uppercase">
+                    PREPARING MEDIA PIPELINE ...
+                </p>
             </div>
-            <div class="flex justify-between text-xs mono text-slate-400">
-                <span id="loading-status-text">INITIALIZING...</span>
-                <span id="intro-percent">0%</span>
+
+            <!-- ANIMATED PROGRESS BAR & STATUS -->
+            <div class="w-full space-y-2">
+                <div class="w-full bg-slate-900/90 rounded-full h-1.5 overflow-hidden border border-white/10 p-0.5">
+                    <div id="intro-bar" class="bg-gradient-to-r from-cyan-500 via-teal-400 to-red-500 h-full rounded-full w-0 transition-all duration-100"></div>
+                </div>
+                <div class="flex justify-between text-[10px] mono text-slate-400 font-bold px-1">
+                    <span>CORE ENGINE</span>
+                    <span id="intro-percent" class="text-slate-200">0%</span>
+                </div>
             </div>
+
         </div>
     </div>
 
     <!-- MAIN APP CONTENT -->
-    <div id="app-content" class="relative z-10 max-w-4xl mx-auto px-4 py-10 space-y-8 opacity-0 transition-opacity duration-1000">
+    <div id="app-content" class="relative z-10 max-w-4xl mx-auto px-4 py-8 space-y-8 opacity-0 transition-opacity duration-1000">
 
-        <!-- HEADER & COUNTERS -->
-        <header class="text-center space-y-4">
-            <h1 class="text-3xl md:text-5xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-red-500 uppercase">
-                Tamim X Video Patcher
-            </h1>
-            <p class="text-xs md:text-sm text-slate-400 mono">TIKTOK OPTIMIZED HIGH-FRAME RENDER ENGINE</p>
+        <!-- HEADER WITH LOGO & TITLE -->
+        <header class="flex flex-col items-center space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 border border-red-500/50 shadow-lg shadow-red-500/20 rounded-xl overflow-hidden flex items-center justify-center bg-slate-900">
+                    <img src="https://cdn5.telesco.pe/file/JNi5mGCwGJTuB5w3cKGgU0S8DcUH_a57wr47Itadvc-DRp26cyl-QcIb-aWKkounYzgM4cbS_l1CfuT20xvHG7i0hjefuZ9iP0WInORf5KzDHEVcgueYABYtRrdREZdWJExFrgINMKk5q6NBEhJIFfAwb3FiMWTNBxCKX3DusuE7V61dfrR9u80QMDC0aYXxbm-DdAHqT68lumfBM6gn7N17Pjf56hHNDtF-E3sMo5KVodx6cC58CZAFRS9B-9H-JPpTI8VRchkCULJE602qRqfp4h8gTJb4R0FEI1zrRWPSnwfMc8zO2A-xMWb4di8l5SDKatKMyhxwouACKnCOPg.jpg" onerror="this.onerror=null; this.src='https://via.placeholder.com/36?text=T';" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <h1 class="text-xl md:text-2xl font-black tracking-widest text-slate-100 mono uppercase">
+                    TAMIM <span class="text-slate-400">X</span> <span class="text-red-500">PATCHER</span>
+                </h1>
+            </div>
+
+            <div class="text-center">
+                <h2 class="text-3xl font-black text-white tracking-wider">STUDIO<span class="text-red-500">.</span></h2>
+                <p class="text-xs text-slate-400 mono mt-1">Universal Cross-Platform Video Renderer. Processed 100% locally on Android, iOS & Windows.</p>
+            </div>
 
             <!-- STATS COUNTER -->
             <div class="flex justify-center gap-4 pt-2">
@@ -102,43 +183,16 @@
             </div>
         </div>
 
-        <!-- STEP 01: SELECT METHOD -->
+        <!-- STEP 01: UPLOAD -->
         <div class="relative pl-12">
             <div class="step-connector"></div>
             <div class="absolute left-0 top-0 w-10 h-10 border border-cyan-500/50 bg-[#030712] text-cyan-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">01</div>
             <div class="space-y-3">
-                <h2 class="text-lg font-bold tracking-wider uppercase">Select Patch Method</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- FPS Card -->
-                    <div id="method-fps" onclick="selectMethod('fps')" class="glass-card p-5 rounded-2xl cursor-pointer transition-all duration-300 method-card-active space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-sm">Ultra FPS Booster</span>
-                            <span id="badge-fps" class="text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20">● ACTIVE</span>
-                        </div>
-                        <p class="text-xs text-slate-400">Forces smooth 120 FPS output for smooth playback.</p>
-                    </div>
-                    <!-- Hybrid Card -->
-                    <div id="method-hybrid" onclick="selectMethod('hybrid')" class="glass-card p-5 rounded-2xl cursor-pointer transition-all duration-300 opacity-75 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-sm">TikTok Hybrid Studio</span>
-                            <span id="badge-hybrid" class="text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5">STANDBY</span>
-                        </div>
-                        <p class="text-xs text-slate-400">Rescale to 1080p @ 60 FPS (Best for TikTok uploading).</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- STEP 02: UPLOAD & PROCESS -->
-        <div class="relative pl-12">
-            <div class="step-connector"></div>
-            <div class="absolute left-0 top-0 w-10 h-10 border border-cyan-500/50 bg-[#030712] text-cyan-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">02</div>
-            <div class="space-y-3">
-                <h2 class="text-lg font-bold tracking-wider uppercase">Upload & Process</h2>
+                <h2 class="text-lg font-bold tracking-wider uppercase">Upload</h2>
                 <div class="glass-card p-6 rounded-2xl space-y-4">
                     <div id="drop-zone" class="border-2 border-dashed border-white/10 hover:border-cyan-500/50 transition-all rounded-xl p-8 text-center cursor-pointer bg-slate-900/30">
-                        <p class="text-sm text-slate-300 font-medium">Click or Drag & Drop Video Here</p>
-                        <p class="text-xs text-slate-500 mt-1 mono">MP4, WEBM, MOV Supported</p>
+                        <p class="text-sm font-bold text-slate-200 tracking-wider">DROP YOUR CLIP</p>
+                        <p class="text-xs text-cyan-400 mt-1 mono">or <span class="underline">click to browse</span></p>
                         <input type="file" id="video-input" accept="video/*" class="hidden">
                     </div>
                     <div id="file-name" class="text-xs text-cyan-400 mono hidden"></div>
@@ -147,6 +201,33 @@
                         <span id="pulse-ring" class="absolute inset-0 bg-cyan-500/20 hidden animate-pulse"></span>
                         <span id="btn-text">SELECT A FILE FIRST</span>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 02: METHOD -->
+        <div class="relative pl-12">
+            <div class="step-connector"></div>
+            <div class="absolute left-0 top-0 w-10 h-10 border border-cyan-500/50 bg-[#030712] text-cyan-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">02</div>
+            <div class="space-y-3">
+                <h2 class="text-lg font-bold tracking-wider uppercase">Method</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- FPS Card -->
+                    <div id="method-fps" onclick="selectMethod('fps')" class="glass-card p-5 rounded-2xl cursor-pointer transition-all duration-300 method-card-active space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-sm">FPS METHOD</span>
+                            <span id="badge-fps" class="text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20">● ACTIVE</span>
+                        </div>
+                        <p class="text-xs text-slate-400">— Fast Universal Render (Mobile & PC)</p>
+                    </div>
+                    <!-- Hybrid Card -->
+                    <div id="method-hybrid" onclick="selectMethod('hybrid')" class="glass-card p-5 rounded-2xl cursor-pointer transition-all duration-300 opacity-75 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-sm">HYBRID METHOD (720P/1080P)</span>
+                            <span id="badge-hybrid" class="text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5">STANDBY</span>
+                        </div>
+                        <p class="text-xs text-slate-400">— Auto Scaled Quality Boost (Best for TikTok Uploads)</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,51 +263,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // 1. GLASSY AURORA BACKGROUND ANIMATION
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        let orbs = [];
-        for (let i = 0; i < 6; i++) {
-            orbs.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 200 + 150,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                color: i % 2 === 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)'
-            });
-        }
-
-        function drawBackground() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            orbs.forEach(orb => {
-                orb.x += orb.vx;
-                orb.y += orb.vy;
-                if (orb.x < -150 || orb.x > canvas.width + 150) orb.vx *= -1;
-                if (orb.y < -150 || orb.y > canvas.height + 150) orb.vy *= -1;
-
-                let gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
-                gradient.addColorStop(0, orb.color);
-                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-                ctx.beginPath();
-                ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
-                ctx.fill();
-            });
-            requestAnimationFrame(drawBackground);
-        }
-        drawBackground();
-
-        // 2. LOADING SCREEN ANIMATION
+        // 1. INTRO SCREEN ANIMATION
         window.addEventListener('DOMContentLoaded', () => {
             const introScreen = document.getElementById('intro-screen');
             const introBar = document.getElementById('intro-bar');
@@ -234,18 +271,26 @@
             const statusText = document.getElementById('loading-status-text');
             const appContent = document.getElementById('app-content');
 
-            const statusMessages = ["SYSTEM INITIALIZING...", "LOADING CORE ENGINE...", "PREPARING MEDIA PIPELINE...", "LAUNCHING STUDIO..."];
+            const statusMessages = [
+                "INITIALIZING ENGINE ...",
+                "LOADING CORE MODULES ...",
+                "PREPARING MEDIA PIPELINE ...",
+                "LAUNCHING STUDIO ..."
+            ];
+            
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 2;
                 if (introBar) introBar.style.width = `${progress}%`;
                 if (introPercent) introPercent.textContent = `${progress}%`;
+                
                 if (statusText) {
-                    if (progress < 30) statusText.textContent = statusMessages[0];
+                    if (progress < 25) statusText.textContent = statusMessages[0];
                     else if (progress < 60) statusText.textContent = statusMessages[1];
-                    else if (progress < 90) statusText.textContent = statusMessages[2];
+                    else if (progress < 85) statusText.textContent = statusMessages[2];
                     else statusText.textContent = statusMessages[3];
                 }
+
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
@@ -258,10 +303,10 @@
                         }
                     }, 300);
                 }
-            }, 20);
+            }, 25);
         });
 
-        // 3. TIKTOK DOWNLOADER BOT LOGIC
+        // 2. TIKTOK DOWNLOADER BOT LOGIC
         async function downloadTikTokVideo() {
             const urlInput = document.getElementById('dl-url-input');
             const statusText = document.getElementById('dl-status');
@@ -299,7 +344,7 @@
             }
         }
 
-        // 4. METHOD SELECTION LOGIC
+        // 3. METHOD SELECTION LOGIC
         let selectedMethod = 'fps';
         function selectMethod(method) {
             selectedMethod = method;
@@ -329,7 +374,7 @@
             }
         }
 
-        // 5. RENDER ENGINE LOGIC (TIKTOK HIGH QUALITY OPTIMIZED)
+        // 4. RENDER ENGINE LOGIC
         const videoInput = document.getElementById('video-input');
         const dropZone = document.getElementById('drop-zone');
         const fileNameDisplay = document.getElementById('file-name');
@@ -407,7 +452,6 @@
                     ...dest.stream.getAudioTracks()
                 ]);
 
-                // TikTok High Quality Bitrate Setup (15 Mbps)
                 const options = {
                     videoBitsPerSecond: 15000000, 
                     audioBitsPerSecond: 128000
@@ -445,7 +489,7 @@
                     pulseRing.classList.add('hidden');
 
                     audioCtx.close();
-                    incrementRenderCount(); // রেন্ডার সম্পূর্ণ হলে সার্ভার কাউন্ট বৃদ্ধি পাবে
+                    incrementRenderCount();
                 };
 
                 recorder.start();
@@ -475,10 +519,9 @@
             }
         });
 
-        // 6. REAL-TIME COUNTER LOGIC (UNIQUE VISITORS)
+        // 5. REAL-TIME COUNTER LOGIC
         const USERNAME = 'tamim_patcher';
 
-        // ইউনিক ভিজিটর ট্র্যাকিং
         if (!localStorage.getItem('visited_' + USERNAME)) {
             fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors/up`)
                 .then(res => res.json())
@@ -496,7 +539,6 @@
                 .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
         }
 
-        // রেন্ডার সংখ্যা পড়ার লজিক
         fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders`)
             .then(res => res.json())
             .then(data => {
@@ -505,7 +547,6 @@
             })
             .catch(() => { document.getElementById('render-count').innerText = '0'; });
 
-        // রেন্ডার সমাপ্ত হওয়ার পর কাউন্টার বাড়ানোর ফাংশন
         function incrementRenderCount() {
             fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders/up`)
                 .then(res => res.json())
