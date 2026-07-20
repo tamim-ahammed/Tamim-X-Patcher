@@ -103,6 +103,23 @@
     .animate-pulse-ring {
         animation: pulse-ring 3s infinite ease-in-out;
     }
+
+   /* Intro Scanline Speed & Grid Effects */
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(1000%); }
+}
+.animate-scanline {
+    animation: scanline 2.5s linear infinite;
+}
+
+/* Intro Hide Smooth Blur Transition */
+.intro-exit {
+    opacity: 0 !important;
+    filter: blur(20px) scale(1.1);
+    pointer-events: none;
+}
+        
 </style>
 </head>
 <body class="min-h-screen relative">
@@ -118,33 +135,46 @@
         </svg>
     </a>
 
-    <!-- INTRO LOADING SCREEN -->
-    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030712] flex flex-col items-center justify-center transition-opacity duration-700 ease-out">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-10 w-full animate-scanline pointer-events-none"></div>
+   <!-- PREMIUM CYBERPUNK INTRO LOADING SCREEN -->
+<div id="intro-screen" class="fixed inset-0 z-50 bg-[#030712] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out">
+    <!-- Animated Cyber Grid Background -->
+    <div class="absolute inset-0 bg-[radial-gradient(#ef4444_1px,transparent_1px)] [background-size:24px_24px] opacity-15 animate-pulse"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-20 w-full animate-scanline pointer-events-none"></div>
 
-        <div class="text-center space-y-6 relative z-10 px-4">
-            <div class="relative inline-block">
-                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-br from-red-600 via-red-500 to-black p-0.5 glow-logo animate-bounce">
-                    <div class="w-full h-full bg-[#0d0e12] rounded-[22px] flex items-center justify-center overflow-hidden p-2">
-                        <img src="https://cdn5.telesco.pe/file/ixuOhkd2eaFmLNOMUuoLsd3V2IUd7aV_Gxwg6ayyHplLGbZWU3qoxmmUtqwXQzKNH1HPmqS7Dv0lXzFr0jQ2SK3mKBWYAQqCI5t9aCRafvCX84Wlw5SrD3nLGQFIpDW4MlRRW1WfxZI6lzyz2WJ-hxM8Yazdc-2aDKCzD8Fk53wXZRrTYybyoHbLETUEfFH0QpI7_dnpvb8LhyX3eDHRa9s6SJxbILu0Y80-O8zTvpTgm3-LmIZ6MRYgNj9jorw4UBEn3tdXGQqnyMMCXU-O7sX1o_t0RL5Zjy2zDnZjzKdTXQgJnwwIx2ySKAGj3JGw47ItCZoZeZ4L3hlOwpTKhg.jpg" alt="Tamim Logo" class="w-full h-full object-contain rounded-xl" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAMIM';">
-                    </div>
+    <div class="text-center space-y-8 relative z-10 px-4 max-w-sm w-full">
+        <!-- Logo Container with Holographic Pulse & Rotation -->
+        <div class="relative inline-block group">
+            <div class="absolute -inset-2 bg-gradient-to-r from-red-600 via-cyan-500 to-red-600 rounded-3xl blur-xl opacity-70 animate-pulse"></div>
+            <div class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-[#090d16] p-1 border border-white/20 shadow-2xl backdrop-blur-xl">
+                <div class="w-full h-full bg-[#030712] rounded-[22px] flex items-center justify-center overflow-hidden p-3 relative">
+                    <img src="logo.png" alt="Tamim Logo" class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAMIM';">
                 </div>
             </div>
+        </div>
 
-            <div class="space-y-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-widest text-white uppercase">
-                    TAMIM X <span class="text-red-500"> PATCHER</span>
-                </h1>
-                <p class="text-xs text-slate-400 mono tracking-widest uppercase">INITIALIZING ENGINE...</p>
+        <!-- Typography -->
+        <div class="space-y-2">
+            <h1 class="text-3xl font-extrabold tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                TAMIM X <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-400"> PATCHER</span>
+            </h1>
+            <p id="loading-status-text" class="text-xs text-cyan-400 mono tracking-[0.3em] uppercase animate-pulse">
+                SYSTEM INITIALIZING...
+            </p>
+        </div>
+
+        <!-- Sleek Neon Progress Bar -->
+        <div class="space-y-2">
+            <div class="w-full bg-slate-900/90 h-2 rounded-full p-0.5 border border-white/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] relative overflow-hidden">
+                <div id="intro-bar" class="bg-gradient-to-r from-red-600 via-amber-400 to-cyan-400 h-full w-0 rounded-full transition-all duration-200 ease-out shadow-[0_0_15px_rgba(6,182,212,0.8)]"></div>
             </div>
-
-            <div class="w-48 sm:w-64 bg-slate-900/80 h-1.5 rounded-full mx-auto overflow-hidden border border-slate-800">
-                <div id="intro-bar" class="bg-gradient-to-r from-red-500 via-amber-400 to-cyan-400 h-full w-0 transition-all duration-300"></div>
+            
+            <div class="flex justify-between items-center text-[11px] mono text-slate-500 font-bold px-1">
+                <span>CORE ENGINE</span>
+                <span id="intro-percent" class="text-white">0%</span>
             </div>
-
-            <p id="intro-percent" class="text-xs text-slate-500 mono">0%</p>
         </div>
     </div>
+</div>
 
     <!-- MAIN GLASS APP CONTAINER -->
     <div id="app-content" class="py-10 px-4 sm:px-6 max-w-xl mx-auto border-x border-white/5 relative opacity-0 transition-opacity duration-700 glass-card rounded-3xl my-6">
@@ -319,32 +349,53 @@
         }
         drawBackground();
 
-        // 2. INTRO ANIMATION LOGIC
-        window.addEventListener('DOMContentLoaded', () => {
-            const introScreen = document.getElementById('intro-screen');
-            const introBar = document.getElementById('intro-bar');
-            const introPercent = document.getElementById('intro-percent');
-            const appContent = document.getElementById('app-content');
+        // 2. ADVANCED INTRO LOADING ANIMATION LOGIC
+window.addEventListener('DOMContentLoaded', () => {
+    const introScreen = document.getElementById('intro-screen');
+    const introBar = document.getElementById('intro-bar');
+    const introPercent = document.getElementById('intro-percent');
+    const statusText = document.getElementById('loading-status-text');
+    const appContent = document.getElementById('app-content');
 
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                if (introBar) introBar.style.width = `${progress}%`;
-                if (introPercent) introPercent.textContent = `${progress}%`;
-                if (progress >= 100) {
-                    clearInterval(interval);
+    const statusMessages = [
+        "SYSTEM INITIALIZING...",
+        "LOADING CORE ENGINE...",
+        "PREPARING MEDIA PIPELINE...",
+        "LAUNCHING STUDIO..."
+    ];
+
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 2; // Smooth Increment
+
+        // Update progress UI
+        if (introBar) introBar.style.width = `${progress}%`;
+        if (introPercent) introPercent.textContent = `${progress}%`;
+
+        // Dynamic Status Message Change
+        if (statusText) {
+            if (progress < 30) statusText.textContent = statusMessages[0];
+            else if (progress < 60) statusText.textContent = statusMessages[1];
+            else if (progress < 90) statusText.textContent = statusMessages[2];
+            else statusText.textContent = statusMessages[3];
+        }
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            
+            // Ultra Smooth Futuristic Fadeout
+            setTimeout(() => {
+                if (introScreen) {
+                    introScreen.classList.add('intro-exit');
                     setTimeout(() => {
-                        if (introScreen) {
-                            introScreen.classList.add('opacity-0');
-                            setTimeout(() => {
-                                introScreen.style.display = 'none';
-                                if (appContent) appContent.classList.remove('opacity-0');
-                            }, 500);
-                        }
-                    }, 200);
+                        introScreen.style.display = 'none';
+                        if (appContent) appContent.classList.remove('opacity-0');
+                    }, 800);
                 }
-            }, 30);
-        });
+            }, 300);
+        }
+    }, 25);
+});
 
         // 3. METHOD SELECTION LOGIC
         let selectedMethod = 'fps';
