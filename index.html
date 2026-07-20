@@ -16,9 +16,21 @@
             font-family: 'Space Grotesk', sans-serif;
             background-color: #08080a;
             color: #e2e8f0;
+            overflow-x: hidden;
         }
         .mono {
             font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Animated Canvas BG */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* Glowing Effects */
@@ -45,6 +57,14 @@
         }
 
         /* UI Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
         @keyframes pulse-ring {
             0% { transform: scale(0.95); opacity: 0.8; }
             50% { transform: scale(1.05); opacity: 0.4; }
@@ -63,58 +83,64 @@
         }
     </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
+<body class="min-h-screen relative">
 
-    <!-- ================= INTRO LOADING SCREEN ================= -->
+    <!-- Background Animated Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Floating Telegram Button -->
+    <!-- আপনার টেলিগ্রাম চ্যানেলের লিংক নিচে href="" এর মধ্যে দিন -->
+    <a href="https://t.me/tamim_exee" target="_blank" rel="noopener noreferrer" 
+       class="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-sky-500 hover:bg-sky-400 text-white rounded-full shadow-[0_0_20px_rgba(56,189,248,0.5)] animate-float transition-transform duration-300 hover:scale-110 group">
+        <svg class="w-7 h-7 fill-current transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-2.02 9.52c-.15.68-.56.84-1.13.53l-3.1-2.29-1.5 1.44c-.17.17-.31.31-.63.31l.22-3.17 5.77-5.21c.25-.22-.05-.35-.39-.12l-7.14 4.5-3.07-.96c-.67-.21-.68-.67.14-.99l12.01-4.63c.56-.21 1.05.13.84.87z"/>
+        </svg>
+        <!-- Tooltip Label -->
+        <span class="absolute right-16 bg-slate-900 text-sky-400 text-xs font-mono font-bold px-3 py-1.5 rounded-lg border border-sky-500/30 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
+            JOIN TELEGRAM
+        </span>
+    </a>
+
+    <!-- INTRO LOADING SCREEN -->
     <div id="intro-screen" class="fixed inset-0 z-50 bg-[#08080a] flex flex-col items-center justify-center transition-opacity duration-700 ease-out">
-        
-        <!-- Background Scanline effect -->
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-10 w-full animate-scanline pointer-events-none"></div>
 
         <div class="text-center space-y-6 relative z-10 px-4">
-            
-            <!-- Your Animated Logo -->
             <div class="relative inline-block">
                 <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-red-600 via-red-500 to-black p-0.5 glow-logo animate-bounce">
                     <div class="w-full h-full bg-[#0d0e12] rounded-2xl flex items-center justify-center overflow-hidden">
-                        <!-- কাস্টম লোগো টেস্ট: এখানে আপনার নাম/লোগোর প্রথম অক্ষর দিতে পারেন -->
                         <span class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-400">
-                            M
+                            T
                         </span>
                     </div>
                 </div>
-                <!-- Glowing Aura Behind Logo -->
                 <div class="absolute -inset-2 bg-red-500/20 rounded-3xl blur-xl -z-10 animate-pulse"></div>
             </div>
 
-            <!-- Name and Title -->
             <div class="space-y-1">
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-widest text-white uppercase">
-                    Tamim X <span class="text-red-500">Patcher</span>
+                    TAMIM <span class="text-red-500">EXEE</span>
                 </h1>
                 <p class="text-xs text-slate-400 mono tracking-widest uppercase">INITIALIZING ENGINE...</p>
             </div>
 
-            <!-- Loader Bar -->
             <div class="w-48 sm:w-64 bg-slate-900 h-1.5 rounded-full mx-auto overflow-hidden border border-slate-800">
                 <div id="intro-bar" class="bg-gradient-to-r from-red-500 via-amber-400 to-cyan-400 h-full w-0 transition-all duration-300"></div>
             </div>
 
-            <!-- Status Percentage -->
             <p id="intro-percent" class="text-xs text-slate-500 mono">0%</p>
         </div>
     </div>
-    <!-- ======================================================== -->
 
 
-    <!-- ================= MAIN APP CONTENT ================= -->
-    <div id="app-content" class="py-10 px-4 sm:px-6 max-w-xl mx-auto border-x border-slate-900/80 relative opacity-0 transition-opacity duration-700">
+    <!-- MAIN APP CONTENT -->
+    <div id="app-content" class="py-10 px-4 sm:px-6 max-w-xl mx-auto border-x border-slate-900/80 relative opacity-0 transition-opacity duration-700 bg-[#08080a]/80 backdrop-blur-sm">
 
-        <!-- Header / Navbar -->
+        <!-- Header -->
         <header class="flex items-center justify-between pb-8 border-b border-slate-800/80 mb-10">
             <div class="flex items-center space-x-2">
-                <span class="bg-red-500 text-black font-extrabold px-2 py-0.5 text-lg rounded-sm">M</span>
-                <span class="text-xl font-bold tracking-wider">PATCHER<span class="text-red-500">.DEV</span></span>
+                <span class="bg-red-500 text-black font-extrabold px-2 py-0.5 text-lg rounded-sm">T</span>
+                <span class="text-xl font-bold tracking-wider">Tamim X<span class="text-red-500">PATCHER</span></span>
             </div>
             <button class="border border-slate-700 hover:border-slate-500 p-2 rounded transition">
                 <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,7 +149,7 @@
             </button>
         </header>
 
-        <!-- Studio Title Section -->
+        <!-- Studio Title -->
         <div class="mb-12">
             <h1 class="text-4xl font-extrabold tracking-tight text-white mb-2">STUDIO<span class="text-red-500">.</span></h1>
             <p class="text-slate-400 text-sm leading-relaxed">
@@ -147,7 +173,6 @@
                         <p class="text-xs text-slate-500 uppercase tracking-widest mono">Drop in the clip you want to process</p>
                     </div>
 
-                    <!-- Dropzone Card -->
                     <div id="drop-zone" class="border border-slate-800 bg-[#0d0e12] hover:border-slate-700 p-8 text-center transition cursor-pointer relative group">
                         <input type="file" id="video-input" accept="video/mp4,video/mov,video/webm" class="hidden">
                         
@@ -176,35 +201,33 @@
                         <p class="text-xs text-slate-500 uppercase tracking-widest mono">Choose which pipeline your clip runs through</p>
                     </div>
 
-                    <!-- Method Cards -->
+                    <!-- Method Selector -->
                     <div class="space-y-3">
-                        <div class="border glow-red bg-[#0e0a0a] p-4 transition cursor-pointer relative">
+                        <!-- FPS Method -->
+                        <div id="method-fps" onclick="selectMethod('fps')" class="border glow-red bg-[#0e0a0a] p-4 transition cursor-pointer relative">
                             <div class="flex items-center justify-between mb-2">
-                                <div class="p-2 bg-red-500/10 border border-red-500/30 text-red-500">
-                                    ⚡
-                                </div>
-                                <span class="text-[10px] mono text-red-400 font-bold tracking-widest uppercase flex items-center gap-1">
+                                <div class="p-2 bg-red-500/10 border border-red-500/30 text-red-500">⚡</div>
+                                <span id="badge-fps" class="text-[10px] mono text-red-400 font-bold tracking-widest uppercase flex items-center gap-1">
                                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> ACTIVE
                                 </span>
                             </div>
                             <h4 class="font-bold text-white tracking-wide">FPS METHOD</h4>
                             <ul class="text-xs text-slate-400 mono mt-2 space-y-1">
-                                <li>— 60 / 120 FPS source</li>
+                                <li>— Fast Compress & Smooth FPS</li>
                                 <li>— No upload · local only</li>
                             </ul>
                         </div>
 
-                        <div class="border border-slate-800/80 bg-[#0d0e12] p-4 opacity-60 hover:opacity-100 transition cursor-pointer">
+                        <!-- Hybrid Method -->
+                        <div id="method-hybrid" onclick="selectMethod('hybrid')" class="border border-slate-800 bg-[#0d0e12] p-4 opacity-60 hover:opacity-100 transition cursor-pointer relative">
                             <div class="flex items-center justify-between mb-2">
-                                <div class="p-2 bg-slate-800 text-slate-400">
-                                    🔳
-                                </div>
-                                <span class="text-[10px] mono text-slate-500 font-bold tracking-widest uppercase">STANDBY</span>
+                                <div class="p-2 bg-slate-800 text-slate-400">🔳</div>
+                                <span id="badge-hybrid" class="text-[10px] mono text-slate-500 font-bold tracking-widest uppercase">STANDBY</span>
                             </div>
-                            <h4 class="font-bold text-slate-200 tracking-wide">HYBRID METHOD</h4>
+                            <h4 class="font-bold text-slate-200 tracking-wide">HYBRID METHOD (1080P)</h4>
                             <ul class="text-xs text-slate-500 mono mt-2 space-y-1">
-                                <li>— Any resolution → auto 1080p</li>
-                                <li>— No upload · local only</li>
+                                <li>— Any resolution → Auto Scaled to 1080p</li>
+                                <li>— Fixed Render Pipeline</li>
                             </ul>
                         </div>
                     </div>
@@ -222,11 +245,10 @@
                 <div class="space-y-3">
                     <div>
                         <h2 class="text-lg font-bold tracking-wider uppercase">Render</h2>
-                        <p class="text-xs text-slate-500 uppercase tracking-widest mono">FPS METHOD · RUNS LOCALLY ON YOUR DEVICE</p>
+                        <p id="method-label" class="text-xs text-slate-500 uppercase tracking-widest mono">FPS METHOD · RUNS LOCALLY ON YOUR DEVICE</p>
                     </div>
 
                     <div class="border border-slate-800 bg-[#0d0e12] p-6 text-center space-y-6">
-                        
                         <div class="flex justify-center">
                             <button id="render-btn" disabled class="w-32 h-32 rounded-full border border-dashed border-slate-700 bg-slate-900/50 flex items-center justify-center font-bold tracking-wider text-slate-500 hover:border-cyan-500 hover:text-cyan-400 disabled:opacity-40 disabled:cursor-not-allowed transition duration-300 relative group">
                                 <span id="btn-text">RENDER</span>
@@ -254,7 +276,6 @@
                             <div id="chk-finalizing" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-slate-600"></span> FINALIZING</div>
                             <div id="chk-complete" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-slate-600"></span> COMPLETE</div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -287,7 +308,61 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Intro Animation Logic
+        // 1. BACKGROUND CANVAS ANIMATION
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 45; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5 + 0.5,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4
+            });
+        }
+
+        function drawBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawBackground);
+        }
+        drawBackground();
+
+        // 2. INTRO ANIMATION
         window.addEventListener('DOMContentLoaded', () => {
             const introScreen = document.getElementById('intro-screen');
             const introBar = document.getElementById('intro-bar');
@@ -302,8 +377,6 @@
 
                 if (progress >= 100) {
                     clearInterval(interval);
-                    
-                    // Fade out intro and show main app
                     setTimeout(() => {
                         introScreen.classList.add('opacity-0');
                         setTimeout(() => {
@@ -312,10 +385,39 @@
                         }, 700);
                     }, 300);
                 }
-            }, 60); // 60ms * 20 = ~1.2 seconds loading duration
+            }, 50);
         });
 
-        // FFmpeg and App Core Logic
+        // 3. METHOD SELECTION LOGIC
+        let selectedMethod = 'fps';
+        function selectMethod(method) {
+            selectedMethod = method;
+            const fpsCard = document.getElementById('method-fps');
+            const hybridCard = document.getElementById('method-hybrid');
+            const badgeFps = document.getElementById('badge-fps');
+            const badgeHybrid = document.getElementById('badge-hybrid');
+            const methodLabel = document.getElementById('method-label');
+
+            if (method === 'fps') {
+                fpsCard.className = "border glow-red bg-[#0e0a0a] p-4 transition cursor-pointer relative";
+                hybridCard.className = "border border-slate-800 bg-[#0d0e12] p-4 opacity-60 hover:opacity-100 transition cursor-pointer relative";
+                badgeFps.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> ACTIVE';
+                badgeFps.className = "text-[10px] mono text-red-400 font-bold tracking-widest uppercase flex items-center gap-1";
+                badgeHybrid.innerHTML = "STANDBY";
+                badgeHybrid.className = "text-[10px] mono text-slate-500 font-bold tracking-widest uppercase";
+                methodLabel.textContent = "FPS METHOD · RUNS LOCALLY ON YOUR DEVICE";
+            } else {
+                hybridCard.className = "border glow-red bg-[#0e0a0a] p-4 transition cursor-pointer relative";
+                fpsCard.className = "border border-slate-800 bg-[#0d0e12] p-4 opacity-60 hover:opacity-100 transition cursor-pointer relative";
+                badgeHybrid.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> ACTIVE';
+                badgeHybrid.className = "text-[10px] mono text-red-400 font-bold tracking-widest uppercase flex items-center gap-1";
+                badgeFps.innerHTML = "STANDBY";
+                badgeFps.className = "text-[10px] mono text-slate-500 font-bold tracking-widest uppercase";
+                methodLabel.textContent = "HYBRID 1080P METHOD · RUNS LOCALLY ON YOUR DEVICE";
+            }
+        }
+
+        // 4. FFMPEG & RENDER LOGIC
         const { createFFmpeg, fetchFile } = FFmpeg;
         const ffmpeg = createFFmpeg({ log: true });
 
@@ -369,10 +471,10 @@
                 }
 
                 setCheckpoint('chk-processing');
-                statusText.textContent = "PATCHING VIDEO";
+                statusText.textContent = "PROCESSING VIDEO";
 
                 ffmpeg.setProgress(({ ratio }) => {
-                    const pct = Math.round(ratio * 100);
+                    const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
                     percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
                     progressBar.style.width = `${pct}%`;
 
@@ -380,7 +482,15 @@
                 });
 
                 ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(selectedFile));
-                await ffmpeg.run('-i', 'input.mp4', '-vcodec', 'libx264', '-crf', '26', '-preset', 'ultrafast', 'output.mp4');
+
+                // FIXED FFmpeg Command Execution based on method selection
+                if (selectedMethod === 'hybrid') {
+                    // Hybrid Method: Force Scale to 1080p width with ultrafast preset (Prevents crashing/errors)
+                    await ffmpeg.run('-i', 'input.mp4', '-vf', 'scale=1080:-2', '-vcodec', 'libx264', '-crf', '28', '-preset', 'ultrafast', '-acodec', 'copy', 'output.mp4');
+                } else {
+                    // FPS/Fast Method
+                    await ffmpeg.run('-i', 'input.mp4', '-vcodec', 'libx264', '-crf', '26', '-preset', 'ultrafast', '-acodec', 'copy', 'output.mp4');
+                }
 
                 setCheckpoint('chk-complete');
                 statusText.textContent = "COMPLETE";
@@ -400,8 +510,8 @@
 
             } catch (err) {
                 console.error(err);
-                statusText.textContent = "ERROR OCCURRED";
-                statusText.classList.replace('text-cyan-400', 'text-red-500');
+                statusText.textContent = "RENDER ERROR";
+                statusText.className = "text-xs font-bold text-red-500 mono";
                 btnText.textContent = "FAILED";
                 pulseRing.classList.add('hidden');
             }
