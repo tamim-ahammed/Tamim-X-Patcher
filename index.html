@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamim's Patcher Studio</title>
+    <title>Tamim X Patcher Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -89,13 +89,11 @@
     <canvas id="bg-canvas"></canvas>
 
     <!-- Floating Telegram Button -->
-    <!-- আপনার টেলিগ্রাম চ্যানেলের লিংক নিচে href="" এর মধ্যে দিন -->
     <a href="https://t.me/tamim_exee" target="_blank" rel="noopener noreferrer" 
        class="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-sky-500 hover:bg-sky-400 text-white rounded-full shadow-[0_0_20px_rgba(56,189,248,0.5)] animate-float transition-transform duration-300 hover:scale-110 group">
         <svg class="w-7 h-7 fill-current transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24">
             <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-2.02 9.52c-.15.68-.56.84-1.13.53l-3.1-2.29-1.5 1.44c-.17.17-.31.31-.63.31l.22-3.17 5.77-5.21c.25-.22-.05-.35-.39-.12l-7.14 4.5-3.07-.96c-.67-.21-.68-.67.14-.99l12.01-4.63c.56-.21 1.05.13.84.87z"/>
         </svg>
-        <!-- Tooltip Label -->
         <span class="absolute right-16 bg-slate-900 text-sky-400 text-xs font-mono font-bold px-3 py-1.5 rounded-lg border border-sky-500/30 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
             JOIN TELEGRAM
         </span>
@@ -106,20 +104,22 @@
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-10 w-full animate-scanline pointer-events-none"></div>
 
         <div class="text-center space-y-6 relative z-10 px-4">
+            
+            <!-- Animated Logo Container -->
             <div class="relative inline-block">
                 <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-red-600 via-red-500 to-black p-0.5 glow-logo animate-bounce">
-                    <div class="w-full h-full bg-[#0d0e12] rounded-2xl flex items-center justify-center overflow-hidden">
-                        <span class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-400">
-                            T
-                        </span>
+                    <div class="w-full h-full bg-[#0d0e12] rounded-2xl flex items-center justify-center overflow-hidden p-2">
+                        <!-- আপনার লোগো ইমেজ: logo.png ফাইলে লোগো ইমেজ রাখবেন -->
+                        <img src="https://cdn5.telesco.pe/file/ixuOhkd2eaFmLNOMUuoLsd3V2IUd7aV_Gxwg6ayyHplLGbZWU3qoxmmUtqwXQzKNH1HPmqS7Dv0lXzFr0jQ2SK3mKBWYAQqCI5t9aCRafvCX84Wlw5SrD3nLGQFIpDW4MlRRW1WfxZI6lzyz2WJ-hxM8Yazdc-2aDKCzD8Fk53wXZRrTYybyoHbLETUEfFH0QpI7_dnpvb8LhyX3eDHRa9s6SJxbILu0Y80-O8zTvpTgm3-LmIZ6MRYgNj9jorw4UBEn3tdXGQqnyMMCXU-O7sX1o_t0RL5Zjy2zDnZjzKdTXQgJnwwIx2ySKAGj3JGw47ItCZoZeZ4L3hlOwpTKhg.jpg" alt="Tamim Logo" class="w-full h-full object-contain rounded-xl" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAMIM';">
                     </div>
                 </div>
                 <div class="absolute -inset-2 bg-red-500/20 rounded-3xl blur-xl -z-10 animate-pulse"></div>
             </div>
 
+            <!-- Name and Title -->
             <div class="space-y-1">
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-widest text-white uppercase">
-                    TAMIM <span class="text-red-500">EXEE</span>
+                    TAMIM X <span class="text-red-500"> PATCHER</span>
                 </h1>
                 <p class="text-xs text-slate-400 mono tracking-widest uppercase">INITIALIZING ENGINE...</p>
             </div>
@@ -138,9 +138,12 @@
 
         <!-- Header -->
         <header class="flex items-center justify-between pb-8 border-b border-slate-800/80 mb-10">
-            <div class="flex items-center space-x-2">
-                <span class="bg-red-500 text-black font-extrabold px-2 py-0.5 text-lg rounded-sm">T</span>
-                <span class="text-xl font-bold tracking-wider">Tamim X<span class="text-red-500">PATCHER</span></span>
+            <div class="flex items-center space-x-3">
+                <!-- ছোট লোগো আইকন -->
+                <div class="w-8 h-8 rounded-lg overflow-hidden border border-red-500/40 p-0.5 bg-black">
+                    <img src="https://cdn5.telesco.pe/file/ixuOhkd2eaFmLNOMUuoLsd3V2IUd7aV_Gxwg6ayyHplLGbZWU3qoxmmUtqwXQzKNH1HPmqS7Dv0lXzFr0jQ2SK3mKBWYAQqCI5t9aCRafvCX84Wlw5SrD3nLGQFIpDW4MlRRW1WfxZI6lzyz2WJ-hxM8Yazdc-2aDKCzD8Fk53wXZRrTYybyoHbLETUEfFH0QpI7_dnpvb8LhyX3eDHRa9s6SJxbILu0Y80-O8zTvpTgm3-LmIZ6MRYgNj9jorw4UBEn3tdXGQqnyMMCXU-O7sX1o_t0RL5Zjy2zDnZjzKdTXQgJnwwIx2ySKAGj3JGw47ItCZoZeZ4L3hlOwpTKhg.jpg" alt="Tamim" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/32?text=T';">
+                </div>
+                <span class="text-xl font-bold tracking-wider text-white">TAMIM X <span class="text-red-500"> PATCHER</span></span>
             </div>
             <button class="border border-slate-700 hover:border-slate-500 p-2 rounded transition">
                 <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,7 +206,6 @@
 
                     <!-- Method Selector -->
                     <div class="space-y-3">
-                        <!-- FPS Method -->
                         <div id="method-fps" onclick="selectMethod('fps')" class="border glow-red bg-[#0e0a0a] p-4 transition cursor-pointer relative">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="p-2 bg-red-500/10 border border-red-500/30 text-red-500">⚡</div>
@@ -218,7 +220,6 @@
                             </ul>
                         </div>
 
-                        <!-- Hybrid Method -->
                         <div id="method-hybrid" onclick="selectMethod('hybrid')" class="border border-slate-800 bg-[#0d0e12] p-4 opacity-60 hover:opacity-100 transition cursor-pointer relative">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="p-2 bg-slate-800 text-slate-400">🔳</div>
@@ -483,12 +484,9 @@
 
                 ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(selectedFile));
 
-                // FIXED FFmpeg Command Execution based on method selection
                 if (selectedMethod === 'hybrid') {
-                    // Hybrid Method: Force Scale to 1080p width with ultrafast preset (Prevents crashing/errors)
                     await ffmpeg.run('-i', 'input.mp4', '-vf', 'scale=1080:-2', '-vcodec', 'libx264', '-crf', '28', '-preset', 'ultrafast', '-acodec', 'copy', 'output.mp4');
                 } else {
-                    // FPS/Fast Method
                     await ffmpeg.run('-i', 'input.mp4', '-vcodec', 'libx264', '-crf', '26', '-preset', 'ultrafast', '-acodec', 'copy', 'output.mp4');
                 }
 
