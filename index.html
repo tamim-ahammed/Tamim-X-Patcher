@@ -269,56 +269,57 @@
         </div>
     </div>
 
+    
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // 🌌 Glassy Screen Aurora Light Animation
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
+        // 1. GLASSY AURORA BACKGROUND ANIMATION
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-let orbs = [];
-for (let i = 0; i < 6; i++) {
-    orbs.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        radius: Math.random() * 200 + 150,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
-        color: i % 2 === 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)' // Red & Cyan Neon Orbs
-    });
-}
+        let orbs = [];
+        for (let i = 0; i < 6; i++) {
+            orbs.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 200 + 150,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                color: i % 2 === 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)'
+            });
+        }
 
-function drawBackground() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    orbs.forEach(orb => {
-        orb.x += orb.vx;
-        orb.y += orb.vy;
+            orbs.forEach(orb => {
+                orb.x += orb.vx;
+                orb.y += orb.vy;
 
-        if (orb.x < -150 || orb.x > canvas.width + 150) orb.vx *= -1;
-        if (orb.y < -150 || orb.y > canvas.height + 150) orb.vy *= -1;
+                if (orb.x < -150 || orb.x > canvas.width + 150) orb.vx *= -1;
+                if (orb.y < -150 || orb.y > canvas.height + 150) orb.vy *= -1;
 
-        let gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
-        gradient.addColorStop(0, orb.color);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                let gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
+                gradient.addColorStop(0, orb.color);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.beginPath();
-        ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-    });
+                ctx.beginPath();
+                ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            });
 
-    requestAnimationFrame(drawBackground);
-}
-drawBackground();
+            requestAnimationFrame(drawBackground);
+        }
+        drawBackground();
 
-        // 2. INTRO ANIMATION
+        // 2. INTRO ANIMATION LOGIC
         window.addEventListener('DOMContentLoaded', () => {
             const introScreen = document.getElementById('intro-screen');
             const introBar = document.getElementById('intro-bar');
@@ -328,16 +329,18 @@ drawBackground();
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
-                introBar.style.width = `${progress}%`;
-                introPercent.textContent = `${progress}%`;
+                if (introBar) introBar.style.width = `${progress}%`;
+                if (introPercent) introPercent.textContent = `${progress}%`;
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
-                        introScreen.classList.add('opacity-0');
-                        setTimeout(() => {
-                            introScreen.style.display = 'none';
-                            appContent.classList.remove('opacity-0');
-                        }, 500);
+                        if (introScreen) {
+                            introScreen.classList.add('opacity-0');
+                            setTimeout(() => {
+                                introScreen.style.display = 'none';
+                                if (appContent) appContent.classList.remove('opacity-0');
+                            }, 500);
+                        }
                     }, 200);
                 }
             }, 30);
@@ -352,156 +355,177 @@ drawBackground();
             const badgeFps = document.getElementById('badge-fps');
             const badgeHybrid = document.getElementById('badge-hybrid');
 
-            if (method === 'fps') {
-                fpsCard.classList.add('method-card-active', 'opacity-100');
-                hybridCard.classList.remove('method-card-active');
-                hybridCard.classList.add('opacity-75');
-                badgeFps.innerHTML = "● ACTIVE";
-                badgeFps.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
-                badgeHybrid.innerHTML = "STANDBY";
-                badgeHybrid.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
-            } else {
-                hybridCard.classList.add('method-card-active', 'opacity-100');
-                fpsCard.classList.remove('method-card-active');
-                fpsCard.classList.add('opacity-75');
-                badgeHybrid.innerHTML = "● ACTIVE";
-                badgeHybrid.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
-                badgeFps.innerHTML = "STANDBY";
-                badgeFps.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
+            if (fpsCard && hybridCard) {
+                if (method === 'fps') {
+                    fpsCard.classList.add('method-card-active', 'opacity-100');
+                    hybridCard.classList.remove('method-card-active');
+                    hybridCard.classList.add('opacity-75');
+                    if (badgeFps) {
+                        badgeFps.innerHTML = "● ACTIVE";
+                        badgeFps.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
+                    }
+                    if (badgeHybrid) {
+                        badgeHybrid.innerHTML = "STANDBY";
+                        badgeHybrid.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
+                    }
+                } else {
+                    hybridCard.classList.add('method-card-active', 'opacity-100');
+                    fpsCard.classList.remove('method-card-active');
+                    fpsCard.classList.add('opacity-75');
+                    if (badgeHybrid) {
+                        badgeHybrid.innerHTML = "● ACTIVE";
+                        badgeHybrid.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
+                    }
+                    if (badgeFps) {
+                        badgeFps.innerHTML = "STANDBY";
+                        badgeFps.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
+                    }
+                }
             }
         }
 
-       // 📌 Fixed Universal Cross-Platform FFmpeg Engine
-const { createFFmpeg, fetchFile } = FFmpeg;
+        // 4. TRUE CROSS-PLATFORM RENDER ENGINE (iOS Safari/Gear, Android & PC Compatible)
+        const videoInput = document.getElementById('video-input');
+        const dropZone = document.getElementById('drop-zone');
+        const fileNameDisplay = document.getElementById('file-name');
+        const renderBtn = document.getElementById('render-btn');
+        const btnText = document.getElementById('btn-text');
+        const pulseRing = document.getElementById('pulse-ring');
+        const statusText = document.getElementById('status-text');
+        const percentageText = document.getElementById('percentage-text');
+        const progressBar = document.getElementById('progress-bar');
+        const outputPlaceholder = document.getElementById('output-placeholder');
+        const downloadLink = document.getElementById('download-link');
 
-// Single-Thread Core load - Works smoothly on iOS Safari, Android & PC
-const ffmpeg = createFFmpeg({ 
-    log: true,
-    corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
-});
+        let selectedFile = null;
 
-// ⚡ Web Canvas Engine (100% Native - Works on iOS, Android, Gear, Windows)
-const videoInput = document.getElementById('video-input');
-const dropZone = document.getElementById('drop-zone');
-const fileNameDisplay = document.getElementById('file-name');
-const renderBtn = document.getElementById('render-btn');
-const btnText = document.getElementById('btn-text');
-const pulseRing = document.getElementById('pulse-ring');
-const statusText = document.getElementById('status-text');
-const percentageText = document.getElementById('percentage-text');
-const progressBar = document.getElementById('progress-bar');
-const outputPlaceholder = document.getElementById('output-placeholder');
-const downloadLink = document.getElementById('download-link');
+        if (dropZone && videoInput) {
+            dropZone.addEventListener('click', () => videoInput.click());
 
-let selectedFile = null;
-
-dropZone.addEventListener('click', () => videoInput.click());
-
-videoInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
-        fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
-        fileNameDisplay.classList.remove('hidden');
-        renderBtn.disabled = false;
-        renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
-        statusText.textContent = "READY TO RENDER";
-    }
-});
-
-renderBtn.addEventListener('click', async () => {
-    if (!selectedFile) return;
-
-    renderBtn.disabled = true;
-    if (pulseRing) pulseRing.classList.remove('hidden');
-    btnText.textContent = "WORKING";
-    statusText.textContent = "PROCESSING VIDEO";
-
-    try {
-        const video = document.createElement('video');
-        video.src = URL.createObjectURL(selectedFile);
-        video.muted = true;
-        video.playsInline = true;
-
-        await new Promise((resolve) => {
-            video.onloadedmetadata = () => resolve();
-        });
-
-        // Setup Hidden Offscreen Canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Target Dimensions (720p scaling for Hybrid, original for FPS)
-        if (typeof selectedMethod !== 'undefined' && selectedMethod === 'hybrid') {
-            const scale = 720 / video.videoHeight;
-            canvas.width = Math.round(video.videoWidth * scale);
-            canvas.height = 720;
-        } else {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            videoInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    selectedFile = e.target.files[0];
+                    if (fileNameDisplay) {
+                        fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
+                        fileNameDisplay.classList.remove('hidden');
+                    }
+                    if (renderBtn) {
+                        renderBtn.disabled = false;
+                        renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
+                    }
+                    if (statusText) statusText.textContent = "READY TO RENDER";
+                }
+            });
         }
 
-        // Support standard formats for iOS/Android
-        const mimeType = MediaRecorder.isTypeSupported('video/mp4') 
-            ? 'video/mp4' 
-            : (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm');
+        if (renderBtn) {
+            renderBtn.addEventListener('click', async () => {
+                if (!selectedFile) return;
 
-        const stream = canvas.captureStream(30); // 30 FPS Target
-        const recorder = new MediaRecorder(stream, { mimeType });
-        const chunks = [];
+                renderBtn.disabled = true;
+                if (pulseRing) pulseRing.classList.remove('hidden');
+                if (btnText) btnText.textContent = "WORKING";
+                if (statusText) statusText.textContent = "PROCESSING VIDEO";
 
-        recorder.ondataavailable = (e) => {
-            if (e.data.size > 0) chunks.push(e.data);
-        };
+                try {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(selectedFile);
+                    video.playsInline = true;
+                    video.muted = true; // Essential for iOS autoplay permission
 
-        recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: mimeType });
-            const videoUrl = URL.createObjectURL(blob);
+                    await new Promise((resolve, reject) => {
+                        video.onloadedmetadata = () => resolve();
+                        video.onerror = () => reject("Error loading video file.");
+                    });
 
-            statusText.textContent = "COMPLETE";
-            percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
-            progressBar.style.width = `100%`;
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-            outputPlaceholder.classList.add('hidden');
-            downloadLink.href = videoUrl;
-            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.${mimeType.includes('mp4') ? 'mp4' : 'webm'}`;
-            downloadLink.classList.remove('hidden');
+                    if (selectedMethod === 'hybrid') {
+                        const scale = 720 / (video.videoHeight || 720);
+                        canvas.width = Math.round((video.videoWidth || 1280) * scale);
+                        canvas.height = 720;
+                    } else {
+                        canvas.width = video.videoWidth || 1280;
+                        canvas.height = video.videoHeight || 720;
+                    }
 
-            btnText.textContent = "DONE";
-            if (pulseRing) pulseRing.classList.add('hidden');
-        };
+                    let mimeType = '';
+                    const types = [
+                        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+                        'video/mp4',
+                        'video/webm;codecs=vp8,opus',
+                        'video/webm'
+                    ];
 
-        // Start Processing Frames
-        recorder.start();
-        await video.play();
+                    for (let t of types) {
+                        if (MediaRecorder.isTypeSupported(t)) {
+                            mimeType = t;
+                            break;
+                        }
+                    }
 
-        const duration = video.duration;
+                    const stream = canvas.captureStream(30);
+                    const recorderOptions = mimeType ? { mimeType } : {};
+                    const recorder = new MediaRecorder(stream, recorderOptions);
+                    const chunks = [];
 
-        function processFrame() {
-            if (video.paused || video.ended) {
-                recorder.stop();
-                return;
-            }
+                    recorder.ondataavailable = (e) => {
+                        if (e.data && e.data.size > 0) chunks.push(e.data);
+                    };
 
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    recorder.onstop = () => {
+                        const finalBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
+                        const videoUrl = URL.createObjectURL(finalBlob);
 
-            // Progress Bar Update
-            const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
-            percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
-            progressBar.style.width = `${pct}%`;
+                        if (statusText) statusText.textContent = "COMPLETE";
+                        if (percentageText) percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
+                        if (progressBar) progressBar.style.width = `100%`;
 
-            requestAnimationFrame(processFrame);
+                        if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
+                        if (downloadLink) {
+                            downloadLink.href = videoUrl;
+                            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.mp4`;
+                            downloadLink.classList.remove('hidden');
+                        }
+
+                        if (btnText) btnText.textContent = "DONE";
+                        if (pulseRing) pulseRing.classList.add('hidden');
+                    };
+
+                    recorder.start();
+                    await video.play();
+
+                    const duration = video.duration || 1;
+
+                    function renderLoop() {
+                        if (video.paused || video.ended) {
+                            recorder.stop();
+                            return;
+                        }
+
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+                        if (percentageText) percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+                        if (progressBar) progressBar.style.width = `${pct}%`;
+
+                        requestAnimationFrame(renderLoop);
+                    }
+
+                    renderLoop();
+
+                } catch (err) {
+                    console.error("Render Failure:", err);
+                    if (statusText) {
+                        statusText.textContent = "RENDER ERROR";
+                        statusText.className = "text-xs font-bold text-red-500 mono";
+                    }
+                    if (btnText) btnText.textContent = "FAILED";
+                    if (pulseRing) pulseRing.classList.add('hidden');
+                }
+            });
         }
-
-        processFrame();
-
-    } catch (err) {
-        console.error("Render Error:", err);
-        statusText.textContent = "RENDER ERROR";
-        statusText.className = "text-xs font-bold text-red-500 mono";
-        btnText.textContent = "FAILED";
-        if (pulseRing) pulseRing.classList.add('hidden');
-    }
-});
     </script>
 </body>
 </html>
