@@ -371,94 +371,119 @@ drawBackground();
             }
         }
 
-        // 4. UNIVERSAL CROSS-PLATFORM FFMPEG ENGINE (ANDROID, iOS & WINDOWS FIX)
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        const ffmpeg = createFFmpeg({ 
-            log: true,
-            corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
+       // 📌 Fixed Universal Cross-Platform FFmpeg Engine
+const { createFFmpeg, fetchFile } = FFmpeg;
+
+// Single-Thread Core load - Works smoothly on iOS Safari, Android & PC
+const ffmpeg = createFFmpeg({ 
+    log: true,
+    corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
+});
+
+const videoInput = document.getElementById('video-input');
+const dropZone = document.getElementById('drop-zone');
+const fileNameDisplay = document.getElementById('file-name');
+const renderBtn = document.getElementById('render-btn');
+const btnText = document.getElementById('btn-text');
+const pulseRing = document.getElementById('pulse-ring');
+const statusText = document.getElementById('status-text');
+const percentageText = document.getElementById('percentage-text');
+const progressBar = document.getElementById('progress-bar');
+const outputPlaceholder = document.getElementById('output-placeholder');
+const downloadLink = document.getElementById('download-link');
+
+let selectedFile = null;
+
+dropZone.addEventListener('click', () => videoInput.click());
+
+videoInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        selectedFile = e.target.files[0];
+        fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
+        fileNameDisplay.classList.remove('hidden');
+        renderBtn.disabled = false;
+        renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
+        statusText.textContent = "READY TO RENDER";
+    }
+});
+
+renderBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+
+    renderBtn.disabled = true;
+    if (pulseRing) pulseRing.classList.remove('hidden');
+    btnText.textContent = "WORKING";
+    statusText.textContent = "LOADING ENGINE";
+
+    try {
+        // Load FFmpeg safely
+        if (!ffmpeg.isLoaded()) {
+            await ffmpeg.load();
+        }
+
+        statusText.textContent = "PROCESSING VIDEO";
+
+        ffmpeg.setProgress(({ ratio }) => {
+            const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+            percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+            progressBar.style.width = `${pct}%`;
         });
 
-        const videoInput = document.getElementById('video-input');
-        const dropZone = document.getElementById('drop-zone');
-        const fileNameDisplay = document.getElementById('file-name');
-        const renderBtn = document.getElementById('render-btn');
-        const btnText = document.getElementById('btn-text');
-        const pulseRing = document.getElementById('pulse-ring');
-        const statusText = document.getElementById('status-text');
-        const percentageText = document.getElementById('percentage-text');
-        const progressBar = document.getElementById('progress-bar');
-        const outputPlaceholder = document.getElementById('output-placeholder');
-        const downloadLink = document.getElementById('download-link');
+        // 1. Fetch File
+        const fileData = await fetchFile(selectedFile);
+        
+        // 2. Safe Input Filename (Fixes -filename hyphen crash on iOS)
+        const inputName = 'input_clip.mp4';
+        const outputName = 'patched_clip.mp4';
+        
+        ffmpeg.FS('writeFile', inputName, fileData);
 
-        let selectedFile = null;
+        // 3. Mobile Safe Video Encoding Arguments
+        if (selectedMethod === 'hybrid') {
+            await ffmpeg.run(
+                '-i', inputName,
+                '-vf', 'scale=trunc(iw*720/ih/2)*2:720', // Safe Scale Filter
+                '-c:v', 'libx264',
+                '-preset', 'ultrafast',
+                '-pix_fmt', 'yuv420p',
+                '-c:a', 'copy',
+                outputName
+            );
+        } else {
+            await ffmpeg.run(
+                '-i', inputName,
+                '-c:v', 'libx264',
+                '-preset', 'ultrafast',
+                '-pix_fmt', 'yuv420p',
+                '-c:a', 'copy',
+                outputName
+            );
+        }
 
-        dropZone.addEventListener('click', () => videoInput.click());
-        videoInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                selectedFile = e.target.files[0];
-                fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
-                fileNameDisplay.classList.remove('hidden');
-                renderBtn.disabled = false;
-                renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
-                statusText.textContent = "READY TO RENDER";
-            }
-        });
+        statusText.textContent = "COMPLETE";
+        percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
+        progressBar.style.width = `100%`;
 
-        renderBtn.addEventListener('click', async () => {
-            if (!selectedFile) return;
+        // Read Output
+        const data = ffmpeg.FS('readFile', outputName);
+        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+        const videoUrl = URL.createObjectURL(videoBlob);
 
-            renderBtn.disabled = true;
-            pulseRing.classList.remove('hidden');
-            btnText.textContent = "WORKING";
-            statusText.textContent = "LOADING ENGINE";
+        outputPlaceholder.classList.add('hidden');
+        downloadLink.href = videoUrl;
+        downloadLink.classList.remove('hidden');
 
-            try {
-                if (!ffmpeg.isLoaded()) {
-                    await ffmpeg.load();
-                }
+        btnText.textContent = "DONE";
+        if (pulseRing) pulseRing.classList.add('hidden');
 
-                statusText.textContent = "PROCESSING VIDEO";
-
-                ffmpeg.setProgress(({ ratio }) => {
-                    const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
-                    percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
-                    progressBar.style.width = `${pct}%`;
-                });
-
-                // Write file safely across mobile RAM
-                const fileData = await fetchFile(selectedFile);
-                ffmpeg.FS('writeFile', 'input.mp4', fileData);
-
-                // Cross-Platform Safe Command (Ultrafast preset, H.264 Baseline for iOS/Android Player compatibility)
-                if (selectedMethod === 'hybrid') {
-                    await ffmpeg.run('-i', 'input.mp4', '-vf', 'scale=-2:720', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', 'output.mp4');
-                } else {
-                    await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', 'output.mp4');
-                }
-
-                statusText.textContent = "COMPLETE";
-                percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
-                progressBar.style.width = `100%`;
-
-                const data = ffmpeg.FS('readFile', 'output.mp4');
-                const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-                const videoUrl = URL.createObjectURL(videoBlob);
-
-                outputPlaceholder.classList.add('hidden');
-                downloadLink.href = videoUrl;
-                downloadLink.classList.remove('hidden');
-
-                btnText.textContent = "DONE";
-                pulseRing.classList.add('hidden');
-
-            } catch (err) {
-                console.error("FFmpeg Render Error:", err);
-                statusText.textContent = "RENDER ERROR";
-                statusText.className = "text-xs font-bold text-red-500 mono";
-                btnText.textContent = "FAILED";
-                pulseRing.classList.add('hidden');
-            }
-        });
+    } catch (err) {
+        console.error("FFmpeg Error Details:", err);
+        statusText.textContent = "RENDER ERROR";
+        statusText.className = "text-xs font-bold text-red-500 mono";
+        btnText.textContent = "FAILED";
+        if (pulseRing) pulseRing.classList.add('hidden');
+    }
+});
     </script>
 </body>
 </html>
