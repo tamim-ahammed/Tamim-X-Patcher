@@ -435,147 +435,172 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 4. TRUE CROSS-PLATFORM RENDER ENGINE (iOS Safari/Gear, Android & PC Compatible)
-        const videoInput = document.getElementById('video-input');
-        const dropZone = document.getElementById('drop-zone');
-        const fileNameDisplay = document.getElementById('file-name');
-        const renderBtn = document.getElementById('render-btn');
-        const btnText = document.getElementById('btn-text');
-        const pulseRing = document.getElementById('pulse-ring');
-        const statusText = document.getElementById('status-text');
-        const percentageText = document.getElementById('percentage-text');
-        const progressBar = document.getElementById('progress-bar');
-        const outputPlaceholder = document.getElementById('output-placeholder');
-        const downloadLink = document.getElementById('download-link');
+        // ⚡ HIGH-QUALITY 120 FPS & 1080P RENDER ENGINE (WITH AUDIO INJECTION)
+const videoInput = document.getElementById('video-input');
+const dropZone = document.getElementById('drop-zone');
+const fileNameDisplay = document.getElementById('file-name');
+const renderBtn = document.getElementById('render-btn');
+const btnText = document.getElementById('btn-text');
+const pulseRing = document.getElementById('pulse-ring');
+const statusText = document.getElementById('status-text');
+const percentageText = document.getElementById('percentage-text');
+const progressBar = document.getElementById('progress-bar');
+const outputPlaceholder = document.getElementById('output-placeholder');
+const downloadLink = document.getElementById('download-link');
 
-        let selectedFile = null;
+let selectedFile = null;
 
-        if (dropZone && videoInput) {
-            dropZone.addEventListener('click', () => videoInput.click());
+if (dropZone && videoInput) {
+    dropZone.addEventListener('click', () => videoInput.click());
 
-            videoInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    selectedFile = e.target.files[0];
-                    if (fileNameDisplay) {
-                        fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
-                        fileNameDisplay.classList.remove('hidden');
-                    }
-                    if (renderBtn) {
-                        renderBtn.disabled = false;
-                        renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
-                    }
-                    if (statusText) statusText.textContent = "READY TO RENDER";
-                }
-            });
+    videoInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            selectedFile = e.target.files[0];
+            if (fileNameDisplay) {
+                fileNameDisplay.textContent = `[FILE]: ${selectedFile.name}`;
+                fileNameDisplay.classList.remove('hidden');
+            }
+            if (renderBtn) {
+                renderBtn.disabled = false;
+                renderBtn.classList.add('text-cyan-400', 'border-cyan-500');
+            }
+            if (statusText) statusText.textContent = "READY TO RENDER";
         }
+    });
+}
 
-        if (renderBtn) {
-            renderBtn.addEventListener('click', async () => {
-                if (!selectedFile) return;
+if (renderBtn) {
+    renderBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
 
-                renderBtn.disabled = true;
-                if (pulseRing) pulseRing.classList.remove('hidden');
-                if (btnText) btnText.textContent = "WORKING";
-                if (statusText) statusText.textContent = "PROCESSING VIDEO";
+        renderBtn.disabled = true;
+        if (pulseRing) pulseRing.classList.remove('hidden');
+        if (btnText) btnText.textContent = "WORKING";
+        if (statusText) statusText.textContent = "PROCESSING VIDEO";
 
-                try {
-                    const video = document.createElement('video');
-                    video.src = URL.createObjectURL(selectedFile);
-                    video.playsInline = true;
-                    video.muted = true; // Essential for iOS autoplay permission
+        try {
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(selectedFile);
+            video.playsInline = true;
+            video.muted = true; // Essential for browser playback during canvas capture
 
-                    await new Promise((resolve, reject) => {
-                        video.onloadedmetadata = () => resolve();
-                        video.onerror = () => reject("Error loading video file.");
-                    });
-
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    if (selectedMethod === 'hybrid') {
-                        const scale = 720 / (video.videoHeight || 720);
-                        canvas.width = Math.round((video.videoWidth || 1280) * scale);
-                        canvas.height = 720;
-                    } else {
-                        canvas.width = video.videoWidth || 1280;
-                        canvas.height = video.videoHeight || 720;
-                    }
-
-                    let mimeType = '';
-                    const types = [
-                        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
-                        'video/mp4',
-                        'video/webm;codecs=vp8,opus',
-                        'video/webm'
-                    ];
-
-                    for (let t of types) {
-                        if (MediaRecorder.isTypeSupported(t)) {
-                            mimeType = t;
-                            break;
-                        }
-                    }
-
-                    const stream = canvas.captureStream(30);
-                    const recorderOptions = mimeType ? { mimeType } : {};
-                    const recorder = new MediaRecorder(stream, recorderOptions);
-                    const chunks = [];
-
-                    recorder.ondataavailable = (e) => {
-                        if (e.data && e.data.size > 0) chunks.push(e.data);
-                    };
-
-                    recorder.onstop = () => {
-                        const finalBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
-                        const videoUrl = URL.createObjectURL(finalBlob);
-
-                        if (statusText) statusText.textContent = "COMPLETE";
-                        if (percentageText) percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
-                        if (progressBar) progressBar.style.width = `100%`;
-
-                        if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
-                        if (downloadLink) {
-                            downloadLink.href = videoUrl;
-                            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.mp4`;
-                            downloadLink.classList.remove('hidden');
-                        }
-
-                        if (btnText) btnText.textContent = "DONE";
-                        if (pulseRing) pulseRing.classList.add('hidden');
-                    };
-
-                    recorder.start();
-                    await video.play();
-
-                    const duration = video.duration || 1;
-
-                    function renderLoop() {
-                        if (video.paused || video.ended) {
-                            recorder.stop();
-                            return;
-                        }
-
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
-                        if (percentageText) percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
-                        if (progressBar) progressBar.style.width = `${pct}%`;
-
-                        requestAnimationFrame(renderLoop);
-                    }
-
-                    renderLoop();
-
-                } catch (err) {
-                    console.error("Render Failure:", err);
-                    if (statusText) {
-                        statusText.textContent = "RENDER ERROR";
-                        statusText.className = "text-xs font-bold text-red-500 mono";
-                    }
-                    if (btnText) btnText.textContent = "FAILED";
-                    if (pulseRing) pulseRing.classList.add('hidden');
-                }
+            await new Promise((resolve, reject) => {
+                video.onloadedmetadata = () => resolve();
+                video.onerror = () => reject("Error loading video file.");
             });
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
+
+            // 1. Resolution Logic
+            if (selectedMethod === 'hybrid') {
+                // 1080p Resolution Setup
+                if (video.videoWidth === video.videoHeight) {
+                    canvas.width = 1080;
+                    canvas.height = 1080;
+                } else {
+                    const scale = 1080 / (video.videoHeight || 1080);
+                    canvas.width = Math.round((video.videoWidth || 1920) * scale);
+                    canvas.height = 1080;
+                }
+            } else {
+                // Original Resolution for FPS Method
+                canvas.width = video.videoWidth || 1280;
+                canvas.height = video.videoHeight || 720;
+            }
+
+            // 2. Audio Capture Injection (Fixes No Sound Issue)
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaElementSource(video);
+            const dest = audioCtx.createMediaStreamDestination();
+            source.connect(dest);
+
+            // 3. Frame Rate Logic (120 FPS for FPS Method, 60 FPS for Hybrid)
+            const targetFPS = selectedMethod === 'fps' ? 120 : 60;
+            const canvasStream = canvas.captureStream(targetFPS);
+
+            // Merge Canvas Video Track + Original Audio Track
+            const combinedStream = new MediaStream([
+                ...canvasStream.getVideoTracks(),
+                ...dest.stream.getAudioTracks()
+            ]);
+
+            // 4. MimeType & High Bitrate Setup (25 Mbps for HD Quality)
+            let mimeType = 'video/mp4';
+            const options = {
+                videoBitsPerSecond: 25000000 // 25 Mbps High Bitrate
+            };
+
+            if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
+                options.mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+            } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+                options.mimeType = 'video/mp4';
+            } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+                options.mimeType = 'video/webm;codecs=vp9,opus';
+            }
+
+            const recorder = new MediaRecorder(combinedStream, options);
+            const chunks = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) chunks.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                const finalBlob = new Blob(chunks, { type: options.mimeType || 'video/mp4' });
+                const videoUrl = URL.createObjectURL(finalBlob);
+
+                if (statusText) statusText.textContent = "COMPLETE";
+                if (percentageText) percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
+                if (progressBar) progressBar.style.width = `100%`;
+
+                if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
+                if (downloadLink) {
+                    downloadLink.href = videoUrl;
+                    downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.mp4`;
+                    downloadLink.classList.remove('hidden');
+                }
+
+                if (btnText) btnText.textContent = "DONE";
+                if (pulseRing) pulseRing.classList.add('hidden');
+                
+                // Close Audio Context
+                audioCtx.close();
+            };
+
+            recorder.start();
+            await video.play();
+
+            const duration = video.duration || 1;
+
+            function renderLoop() {
+                if (video.paused || video.ended) {
+                    recorder.stop();
+                    return;
+                }
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+                if (percentageText) percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+                if (progressBar) progressBar.style.width = `${pct}%`;
+
+                requestAnimationFrame(renderLoop);
+            }
+
+            renderLoop();
+
+        } catch (err) {
+            console.error("Render Failure:", err);
+            if (statusText) {
+                statusText.textContent = "RENDER ERROR";
+                statusText.className = "text-xs font-bold text-red-500 mono";
+            }
+            if (btnText) btnText.textContent = "FAILED";
+            if (pulseRing) pulseRing.classList.add('hidden');
+        }
+    });
+}
         }
     </script>
 </body>
