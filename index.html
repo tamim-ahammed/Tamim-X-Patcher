@@ -600,6 +600,27 @@
             });
         }
 
+
+        // 4. MimeType & High Bitrate Setup (টিকটকের জন্য অপ্টিমাইজড)
+let mimeType = 'video/mp4';
+const options = {
+    // ২৫ Mbps অনেক সময় অতিরিক্ত বড় ফাইল তৈরি করে যা টিকটক প্রসেস করতে পারে না। 
+    // টিকটকের জন্য ১২-১৫ Mbps (12000000 - 15000000) সবচেয়ে বেস্ট এবং স্ট্যাবল।
+    videoBitsPerSecond: 15000000, 
+    audioBitsPerSecond: 128000
+};
+
+// টিকটক H.264 (avc1) সবচেয়ে ভালো সাপোর্ট করে
+if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
+    options.mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+} else if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264')) {
+    options.mimeType = 'video/mp4;codecs=h264';
+} else if (MediaRecorder.isTypeSupported('video/mp4')) {
+    options.mimeType = 'video/mp4';
+} else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+    options.mimeType = 'video/webm;codecs=vp8,opus';
+}
+
         // 5. REAL-TIME COUNTER LOGIC (UNIQUE VISITORS)
 const USERNAME = 'tamim_patcher';
 
