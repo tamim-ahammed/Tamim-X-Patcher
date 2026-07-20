@@ -245,7 +245,7 @@
                                     STANDBY
                                 </span>
                             </div>
-                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (720P/1080P)</h4>
+                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (1080P/1920P)</h4>
                             <p class="text-xs text-slate-400 mono mt-1">— Auto Scaled Quality Boost</p>
                         </div>
                     </div>
@@ -299,6 +299,17 @@
         </div>
     </div>
 
+    <!-- STATS DISPLAY COUNTER -->
+<div class="grid grid-cols-2 gap-3 my-4">
+    <div class="bg-slate-900/60 border border-white/10 rounded-xl p-3 text-center">
+        <p class="text-[10px] text-slate-400 mono">TOTAL VISITORS</p>
+        <p id="visitor-count" class="text-lg font-bold text-cyan-400 mono">...</p>
+    </div>
+    <div class="bg-slate-900/60 border border-white/10 rounded-xl p-3 text-center">
+        <p class="text-[10px] text-slate-400 mono">VIDEOS RENDERED</p>
+        <p id="render-count" class="text-lg font-bold text-red-400 mono">...</p>
+    </div>
+</div>
     
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -602,6 +613,31 @@ if (renderBtn) {
     });
 }
             
+// 📊 REAL-TIME COUNTER LOGIC
+const USERNAME = 'tamim_patcher'; // আপনার একটা ইউনিক নাম
+
+// ১. পেজ লোড হলে ভিজিটর কাউন্ট আপডেট
+fetch(`https://api.countapi.xyz/hit/${USERNAME}/visitors`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('visitor-count').innerText = data.value;
+    });
+
+// ২. বর্তমান রেন্ডার সংখ্যা কত তা নিয়ে আসা
+fetch(`https://api.countapi.xyz/get/${USERNAME}/renders`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('render-count').innerText = data.value || 0;
+    });
+
+// ৩. রেন্ডার সফল হলে (recorder.onstop -এর ভেতরে এই লাইনটি বসাবেন)
+function incrementRenderCount() {
+    fetch(`https://api.countapi.xyz/hit/${USERNAME}/renders`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('render-count').innerText = data.value;
+        });
+}
         
     </script>
 </body>
