@@ -119,7 +119,57 @@
     filter: blur(20px) scale(1.1);
     pointer-events: none;
 }
-        
+
+/* TikTok Bot Glowing Card & Animations */
+.tiktok-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.5) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 15px rgba(245, 158, 11, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Card Glow Effect on Hover */
+.tiktok-card:hover {
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+}
+
+/* Animated Shimmer Wave across the card */
+.tiktok-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 55%
+    );
+    animation: tiktokShimmer 6s infinite linear;
+    pointer-events: none;
+}
+
+/* Pulse Badge Animation */
+.badge-pulse {
+    animation: badgeGlow 2s infinite alternate ease-in-out;
+}
+
+@keyframes tiktokShimmer {
+    0% { transform: translate(-30%, -30%); }
+    100% { transform: translate(30%, 30%); }
+}
+
+@keyframes badgeGlow {
+    0% { opacity: 0.7; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1.03); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+}
+    
 </style>
 </head>
 <body class="min-h-screen relative">
@@ -199,6 +249,59 @@
 
         <!-- Timeline Steps -->
         <div class="space-y-12 relative">
+
+
+            <!-- STEP 00: TIKTOK VIDEO DOWNLOADER BOT -->
+<div class="relative pl-12 my-6">
+    <!-- Step Indicator & Connector -->
+    <div class="absolute left-0 top-0 w-10 h-10 border border-amber-500/50 bg-[#030712] text-amber-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">00</div>
+    
+    <div class="space-y-3">
+        <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold tracking-wider uppercase text-slate-100">TikTok Downloader Bot</h2>
+            <span class="badge-pulse text-[10px] bg-amber-500/20 text-amber-400 font-mono font-bold px-2.5 py-0.5 rounded-full border border-amber-500/40">
+                NO WATERMARK
+            </span>
+        </div>
+
+        <!-- Glowing Animated Card Container -->
+        <div class="tiktok-card p-5 rounded-2xl space-y-4">
+            <div class="flex flex-col sm:flex-row gap-2 relative z-10">
+                <input 
+                    type="text" 
+                    id="dl-url-input" 
+                    placeholder="Paste TikTok Video URL here..." 
+                    class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 font-mono transition-all duration-300"
+                >
+                <button 
+                    id="dl-btn" 
+                    onclick="downloadTikTokVideo()" 
+                    class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:opacity-90 active:scale-95 text-white font-bold px-6 py-3 rounded-xl text-xs tracking-widest uppercase transition-all duration-200 shrink-0 shadow-lg shadow-amber-500/20"
+                >
+                    FETCH VIDEO ⚡
+                </button>
+            </div>
+
+            <!-- Status Indicator -->
+            <div id="dl-status" class="text-xs font-mono hidden transition-all"></div>
+
+            <!-- Download Link Box -->
+            <div id="dl-result" class="hidden pt-2 transition-all duration-300">
+                <a 
+                    id="dl-file-link" 
+                    href="#" 
+                    target="_blank" 
+                    download 
+                    class="block w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-extrabold py-3.5 rounded-xl text-xs text-center tracking-widest uppercase transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-98"
+                >
+                    ⬇️ DOWNLOAD NO-WATERMARK VIDEO
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+            
 
             <!-- STEP 01: UPLOAD -->
             <div class="relative pl-12">
@@ -666,6 +769,53 @@ function incrementRenderCount() {
             if (data && data.count) document.getElementById('render-count').innerText = data.count;
         });
 }
+
+
+ async function downloadTikTokVideo() {
+    const urlInput = document.getElementById('dl-url-input');
+    const statusText = document.getElementById('dl-status');
+    const resultBox = document.getElementById('dl-result');
+    const fileLink = document.getElementById('dl-file-link');
+    const fetchBtn = document.getElementById('dl-btn');
+
+    const videoUrl = urlInput.value.trim();
+    if (!videoUrl) {
+        alert("Please paste a valid TikTok video URL!");
+        return;
+    }
+
+    // UI Feedback: Loading State
+    fetchBtn.disabled = true;
+    fetchBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    statusText.classList.remove('hidden');
+    statusText.textContent = "⌛ FETCHING VIDEO DATA & REMOVING WATERMARK...";
+    statusText.className = "text-xs text-amber-400 font-mono animate-pulse";
+    resultBox.classList.add('hidden');
+
+    try {
+        // Fast API for No-Watermark TikTok Download
+        const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`);
+        const data = await response.json();
+
+        if (data && data.data && data.data.play) {
+            statusText.textContent = "✅ SUCCESS! VIDEO IS READY FOR DOWNLOAD.";
+            statusText.className = "text-xs text-emerald-400 font-mono font-bold";
+
+            fileLink.href = data.data.play;
+            resultBox.classList.remove('hidden');
+        } else {
+            throw new Error("Failed to fetch media.");
+        }
+    } catch (err) {
+        console.error("TikTok Bot Error:", err);
+        statusText.textContent = "❌ ERROR: Could not fetch video. Please check the URL!";
+        statusText.className = "text-xs text-red-500 font-mono font-bold";
+    } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+        
     </script>
 </body>
 </html>
