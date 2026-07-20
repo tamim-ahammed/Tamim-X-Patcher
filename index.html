@@ -380,6 +380,7 @@ const ffmpeg = createFFmpeg({
     corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
 });
 
+// ⚡ Web Canvas Engine (100% Native - Works on iOS, Android, Gear, Windows)
 const videoInput = document.getElementById('video-input');
 const dropZone = document.getElementById('drop-zone');
 const fileNameDisplay = document.getElementById('file-name');
@@ -413,71 +414,88 @@ renderBtn.addEventListener('click', async () => {
     renderBtn.disabled = true;
     if (pulseRing) pulseRing.classList.remove('hidden');
     btnText.textContent = "WORKING";
-    statusText.textContent = "LOADING ENGINE";
+    statusText.textContent = "PROCESSING VIDEO";
 
     try {
-        // Load FFmpeg safely
-        if (!ffmpeg.isLoaded()) {
-            await ffmpeg.load();
-        }
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(selectedFile);
+        video.muted = true;
+        video.playsInline = true;
 
-        statusText.textContent = "PROCESSING VIDEO";
-
-        ffmpeg.setProgress(({ ratio }) => {
-            const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
-            percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
-            progressBar.style.width = `${pct}%`;
+        await new Promise((resolve) => {
+            video.onloadedmetadata = () => resolve();
         });
 
-        // 1. Fetch File
-        const fileData = await fetchFile(selectedFile);
-        
-        // 2. Safe Input Filename (Fixes -filename hyphen crash on iOS)
-        const inputName = 'input_clip.mp4';
-        const outputName = 'patched_clip.mp4';
-        
-        ffmpeg.FS('writeFile', inputName, fileData);
+        // Setup Hidden Offscreen Canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-        // 3. Mobile Safe Video Encoding Arguments
-        if (selectedMethod === 'hybrid') {
-            await ffmpeg.run(
-                '-i', inputName,
-                '-vf', 'scale=trunc(iw*720/ih/2)*2:720', // Safe Scale Filter
-                '-c:v', 'libx264',
-                '-preset', 'ultrafast',
-                '-pix_fmt', 'yuv420p',
-                '-c:a', 'copy',
-                outputName
-            );
+        // Target Dimensions (720p scaling for Hybrid, original for FPS)
+        if (typeof selectedMethod !== 'undefined' && selectedMethod === 'hybrid') {
+            const scale = 720 / video.videoHeight;
+            canvas.width = Math.round(video.videoWidth * scale);
+            canvas.height = 720;
         } else {
-            await ffmpeg.run(
-                '-i', inputName,
-                '-c:v', 'libx264',
-                '-preset', 'ultrafast',
-                '-pix_fmt', 'yuv420p',
-                '-c:a', 'copy',
-                outputName
-            );
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
         }
 
-        statusText.textContent = "COMPLETE";
-        percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
-        progressBar.style.width = `100%`;
+        // Support standard formats for iOS/Android
+        const mimeType = MediaRecorder.isTypeSupported('video/mp4') 
+            ? 'video/mp4' 
+            : (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm');
 
-        // Read Output
-        const data = ffmpeg.FS('readFile', outputName);
-        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-        const videoUrl = URL.createObjectURL(videoBlob);
+        const stream = canvas.captureStream(30); // 30 FPS Target
+        const recorder = new MediaRecorder(stream, { mimeType });
+        const chunks = [];
 
-        outputPlaceholder.classList.add('hidden');
-        downloadLink.href = videoUrl;
-        downloadLink.classList.remove('hidden');
+        recorder.ondataavailable = (e) => {
+            if (e.data.size > 0) chunks.push(e.data);
+        };
 
-        btnText.textContent = "DONE";
-        if (pulseRing) pulseRing.classList.add('hidden');
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: mimeType });
+            const videoUrl = URL.createObjectURL(blob);
+
+            statusText.textContent = "COMPLETE";
+            percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
+            progressBar.style.width = `100%`;
+
+            outputPlaceholder.classList.add('hidden');
+            downloadLink.href = videoUrl;
+            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.${mimeType.includes('mp4') ? 'mp4' : 'webm'}`;
+            downloadLink.classList.remove('hidden');
+
+            btnText.textContent = "DONE";
+            if (pulseRing) pulseRing.classList.add('hidden');
+        };
+
+        // Start Processing Frames
+        recorder.start();
+        await video.play();
+
+        const duration = video.duration;
+
+        function processFrame() {
+            if (video.paused || video.ended) {
+                recorder.stop();
+                return;
+            }
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Progress Bar Update
+            const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+            percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+            progressBar.style.width = `${pct}%`;
+
+            requestAnimationFrame(processFrame);
+        }
+
+        processFrame();
 
     } catch (err) {
-        console.error("FFmpeg Error Details:", err);
+        console.error("Render Error:", err);
         statusText.textContent = "RENDER ERROR";
         statusText.className = "text-xs font-bold text-red-500 mono";
         btnText.textContent = "FAILED";
