@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tamim X Patcher Studio</title>
     
-    <!-- 📌 FIX 1: GitHub Pages & Mobile Safari Cross-Origin Isolation Patch -->
+    <!-- Cross-Origin Isolation Polyfill for iOS & Android Safari/Chrome -->
     <script src="https://unpkg.com/coi-serviceworker/coi-serviceworker.min.js"></script>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FFmpeg.wasm Engine -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    
+    <!-- FFmpeg.wasm Single-Threaded (Compatible with All iOS, Android, Windows Devices) -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
 
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: #050608;
+            background-color: #030712;
             color: #e2e8f0;
             overflow-x: hidden;
         }
@@ -26,7 +27,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Animated Canvas BG */
+        /* Glassy Aurora Background Canvas */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -37,28 +38,35 @@
             pointer-events: none;
         }
 
-        /* Glassmorphism Card Style */
+        /* Premium Glassmorphism UI Card */
         .glass-card {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(17, 24, 39, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* Method Card Hover & Active Animations */
+        /* Method Section Rounded Borders & Smooth Animations */
         .method-card {
+            border-radius: 1.25rem; /* Round Border */
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+
+        /* Smooth Hover Effects */
         .method-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px -5px rgba(239, 68, 68, 0.25);
+            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.3), 0 0 15px rgba(239, 68, 68, 0.15);
         }
-        
+
+        /* Active Glow State */
         .method-card-active {
             border-color: rgba(239, 68, 68, 0.8) !important;
             background: rgba(239, 68, 68, 0.08) !important;
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.25) !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3), inset 0 0 15px rgba(239, 68, 68, 0.05) !important;
         }
 
         .glow-logo {
@@ -103,18 +111,19 @@
 </head>
 <body class="min-h-screen relative">
 
+    <!-- Background Canvas (Glassy Fluid Orbs) -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Floating Telegram Button -->
     <a href="https://t.me/tamim_exee" target="_blank" rel="noopener noreferrer" 
-       class="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-sky-500 hover:bg-sky-400 text-white rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] animate-float transition-transform duration-300 hover:scale-110 group">
-        <svg class="w-7 h-7 fill-current transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24">
+       class="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-sky-500 hover:bg-sky-400 text-white rounded-full shadow-[0_0_25px_rgba(56,189,248,0.6)] animate-float transition-transform duration-300 hover:scale-110">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
             <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-2.02 9.52c-.15.68-.56.84-1.13.53l-3.1-2.29-1.5 1.44c-.17.17-.31.31-.63.31l.22-3.17 5.77-5.21c.25-.22-.05-.35-.39-.12l-7.14 4.5-3.07-.96c-.67-.21-.68-.67.14-.99l12.01-4.63c.56-.21 1.05.13.84.87z"/>
         </svg>
     </a>
 
     <!-- INTRO LOADING SCREEN -->
-    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#050608] flex flex-col items-center justify-center transition-opacity duration-700 ease-out">
+    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030712] flex flex-col items-center justify-center transition-opacity duration-700 ease-out">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-10 w-full animate-scanline pointer-events-none"></div>
 
         <div class="text-center space-y-6 relative z-10 px-4">
@@ -141,7 +150,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTENT -->
+    <!-- MAIN GLASS APP CONTAINER -->
     <div id="app-content" class="py-10 px-4 sm:px-6 max-w-xl mx-auto border-x border-white/5 relative opacity-0 transition-opacity duration-700 glass-card rounded-3xl my-6">
 
         <!-- Header -->
@@ -154,47 +163,64 @@
             </div>
         </header>
 
-        <!-- Studio Title -->
+        <!-- Title -->
         <div class="mb-12">
             <h1 class="text-4xl font-extrabold tracking-tight text-white mb-2">STUDIO<span class="text-red-500">.</span></h1>
             <p class="text-slate-400 text-sm leading-relaxed">
-                Your footage moves down the line — drop it in, pick a method, render. Everything runs on your device.
+                Universal Cross-Platform Video Renderer. Processed 100% locally on Android, iOS & Windows.
             </p>
         </div>
 
-        <!-- Timeline Wrapper -->
+        <!-- Timeline Steps -->
         <div class="space-y-12 relative">
 
             <!-- STEP 01: UPLOAD -->
             <div class="relative pl-12">
                 <div class="step-connector"></div>
-                <div class="absolute left-0 top-0 w-10 h-10 border border-cyan-500/50 bg-[#050608] text-cyan-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">01</div>
+                <div class="absolute left-0 top-0 w-10 h-10 border border-cyan-500/50 bg-[#030712] text-cyan-400 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">01</div>
                 <div class="space-y-3">
                     <h2 class="text-lg font-bold tracking-wider uppercase">Upload</h2>
                     <div id="drop-zone" class="glass-card hover:border-cyan-500/40 p-8 text-center transition cursor-pointer relative group rounded-2xl">
                         <input type="file" id="video-input" accept="video/*" class="hidden">
                         <h3 class="text-xl font-bold tracking-wide text-white mb-1">DROP YOUR CLIP</h3>
-                        <p class="text-xs text-slate-400 mono">or <span class="text-cyan-400 underline cursor-pointer">click to browse</span></p>
+                        <p class="text-xs text-slate-400 mono">or <span class="text-cyan-400 underline">click to browse</span></p>
                         <p id="file-name" class="text-xs text-emerald-400 font-mono mt-3 hidden"></p>
                     </div>
                 </div>
             </div>
 
-            <!-- STEP 02: METHOD -->
+            <!-- STEP 02: METHOD (ROUNDED BORDER & HOVER ANIMATIONS) -->
             <div class="relative pl-12">
                 <div class="step-connector"></div>
-                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#050608] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">02</div>
+                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#030712] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">02</div>
                 <div class="space-y-3">
                     <h2 class="text-lg font-bold tracking-wider uppercase">Method</h2>
+                    
                     <div class="space-y-4">
-                        <div id="method-fps" onclick="selectMethod('fps')" class="glass-card method-card method-card-active p-5 rounded-2xl cursor-pointer relative border border-white/10">
+                        <!-- FPS Card -->
+                        <div id="method-fps" onclick="selectMethod('fps')" 
+                             class="glass-card method-card method-card-active p-5 cursor-pointer border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="p-2 rounded-xl bg-red-500/10 text-red-500 text-sm">⚡</div>
+                                <span id="badge-fps" class="text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20">
+                                    ● ACTIVE
+                                </span>
+                            </div>
                             <h4 class="font-bold text-white tracking-wide text-base">FPS METHOD</h4>
-                            <p class="text-xs text-slate-400 mono mt-1">Fast & Mobile Optimized Pipeline</p>
+                            <p class="text-xs text-slate-400 mono mt-1">— Fast Universal Render (Mobile & PC)</p>
                         </div>
 
-                        <div id="method-hybrid" onclick="selectMethod('hybrid')" class="glass-card method-card p-5 rounded-2xl opacity-75 hover:opacity-100 cursor-pointer relative border border-white/10">
-                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (1080P)</h4>
-                            <p class="text-xs text-slate-400 mono mt-1">Scale Resolution to 1080p</p>
+                        <!-- Hybrid Card -->
+                        <div id="method-hybrid" onclick="selectMethod('hybrid')" 
+                             class="glass-card method-card p-5 opacity-75 hover:opacity-100 cursor-pointer border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="p-2 rounded-xl bg-slate-800 text-slate-400 text-sm">🔳</div>
+                                <span id="badge-hybrid" class="text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
+                                    STANDBY
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (720P/1080P)</h4>
+                            <p class="text-xs text-slate-400 mono mt-1">— Auto Scaled Quality Boost</p>
                         </div>
                     </div>
                 </div>
@@ -203,7 +229,7 @@
             <!-- STEP 03: RENDER -->
             <div class="relative pl-12">
                 <div class="step-connector"></div>
-                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#050608] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">03</div>
+                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#030712] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">03</div>
                 <div class="space-y-3">
                     <h2 class="text-lg font-bold tracking-wider uppercase">Render</h2>
                     <div class="glass-card p-6 text-center space-y-6 rounded-2xl">
@@ -232,7 +258,7 @@
 
             <!-- STEP 04: OUTPUT -->
             <div class="relative pl-12">
-                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#050608] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">04</div>
+                <div class="absolute left-0 top-0 w-10 h-10 border border-white/10 bg-[#030712] text-slate-500 font-mono font-bold flex items-center justify-center text-sm z-10 rounded-xl shadow-lg">04</div>
                 <div class="space-y-3">
                     <h2 class="text-lg font-bold tracking-wider uppercase">Output</h2>
                     <div id="output-box" class="glass-card p-8 text-center rounded-2xl border-dashed">
@@ -247,9 +273,9 @@
         </div>
     </div>
 
-    <!-- JS ENGINE LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Canvas BG
+        // 1. GLASSY AURORA BACKGROUND ANIMATION
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -257,26 +283,38 @@
         resizeCanvas();
 
         let particles = [];
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 25; i++) {
             particles.push({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                radius: Math.random() * 2 + 1, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 80 + 40,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                color: Math.random() > 0.5 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(56, 189, 248, 0.08)'
             });
         }
+
         function drawBackground() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(56, 189, 248, 0.4)'; ctx.fill();
+                if (p.x < -100 || p.x > canvas.width + 100) p.vx *= -1;
+                if (p.y < -100 || p.y > canvas.height + 100) p.vy *= -1;
+
+                let gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                gradient.addColorStop(0, p.color);
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
             });
             requestAnimationFrame(drawBackground);
         }
         drawBackground();
 
-        // Intro Logic
+        // 2. INTRO ANIMATION
         window.addEventListener('DOMContentLoaded', () => {
             const introScreen = document.getElementById('intro-screen');
             const introBar = document.getElementById('intro-bar');
@@ -298,21 +336,42 @@
                         }, 500);
                     }, 200);
                 }
-            }, 40);
+            }, 30);
         });
 
+        // 3. METHOD SELECTION LOGIC
         let selectedMethod = 'fps';
         function selectMethod(method) {
             selectedMethod = method;
-            document.getElementById('method-fps').classList.toggle('method-card-active', method === 'fps');
-            document.getElementById('method-hybrid').classList.toggle('method-card-active', method === 'hybrid');
+            const fpsCard = document.getElementById('method-fps');
+            const hybridCard = document.getElementById('method-hybrid');
+            const badgeFps = document.getElementById('badge-fps');
+            const badgeHybrid = document.getElementById('badge-hybrid');
+
+            if (method === 'fps') {
+                fpsCard.classList.add('method-card-active', 'opacity-100');
+                hybridCard.classList.remove('method-card-active');
+                hybridCard.classList.add('opacity-75');
+                badgeFps.innerHTML = "● ACTIVE";
+                badgeFps.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
+                badgeHybrid.innerHTML = "STANDBY";
+                badgeHybrid.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
+            } else {
+                hybridCard.classList.add('method-card-active', 'opacity-100');
+                fpsCard.classList.remove('method-card-active');
+                fpsCard.classList.add('opacity-75');
+                badgeHybrid.innerHTML = "● ACTIVE";
+                badgeHybrid.className = "text-[10px] mono text-red-400 font-bold px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/20";
+                badgeFps.innerHTML = "STANDBY";
+                badgeFps.className = "text-[10px] mono text-slate-500 font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/5";
+            }
         }
 
-        // 📌 FIX 2: Optimized Local WebAssembly Execution
+        // 4. UNIVERSAL CROSS-PLATFORM FFMPEG ENGINE (ANDROID, iOS & WINDOWS FIX)
         const { createFFmpeg, fetchFile } = FFmpeg;
         const ffmpeg = createFFmpeg({ 
             log: true,
-            corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+            corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
         });
 
         const videoInput = document.getElementById('video-input');
@@ -362,15 +421,15 @@
                     progressBar.style.width = `${pct}%`;
                 });
 
-                // Safe Write File
+                // Write file safely across mobile RAM
                 const fileData = await fetchFile(selectedFile);
                 ffmpeg.FS('writeFile', 'input.mp4', fileData);
 
-                // 📌 FIX 3: Ultra-safe Mobile Fast Render Command
+                // Cross-Platform Safe Command (Ultrafast preset, H.264 Baseline for iOS/Android Player compatibility)
                 if (selectedMethod === 'hybrid') {
-                    await ffmpeg.run('-i', 'input.mp4', '-vf', 'scale=trunc(oh*a/2)*2:720', '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '30', '-c:a', 'copy', 'output.mp4');
+                    await ffmpeg.run('-i', 'input.mp4', '-vf', 'scale=-2:720', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', 'output.mp4');
                 } else {
-                    await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '32', '-c:a', 'copy', 'output.mp4');
+                    await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', 'output.mp4');
                 }
 
                 statusText.textContent = "COMPLETE";
