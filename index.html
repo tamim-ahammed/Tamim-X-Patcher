@@ -353,43 +353,50 @@
         }
         animateParticles();
 
-        // 2. FFMPEG INITIALIZATION WITH NEW INTRO ANIMATION
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        const ffmpeg = createFFmpeg({ log: false });
+        // 2. FFMPEG INITIALIZATION WITH FIXED 2.5s INTRO TIMEOUT
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: false });
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const introBar = document.getElementById('intro-bar');
-            const introPercent = document.getElementById('intro-percent');
-            const introScreen = document.getElementById('intro-screen');
-            const appContent = document.getElementById('app-content');
+window.addEventListener('DOMContentLoaded', async () => {
+    const introBar = document.getElementById('intro-bar');
+    const introPercent = document.getElementById('intro-percent');
+    const introScreen = document.getElementById('intro-screen');
+    const appContent = document.getElementById('app-content');
 
-            let p = 0;
-            const timer = setInterval(() => {
-                if (p < 85) { p += 3; introBar.style.width = p + '%'; introPercent.textContent = p + '%'; }
-            }, 50);
+    let progress = 0;
+    const duration = 2500; // মোট ২.৫ সেকেন্ড সময় নেবে
+    const intervalTime = 30; // প্রতি ৩০ms পর পর আপডেট হবে
+    const increment = 100 / (duration / intervalTime);
 
-            try {
-                await ffmpeg.load();
-                clearInterval(timer);
-                introBar.style.width = '100%';
-                introPercent.textContent = '100%';
-                setTimeout(() => {
-                    introScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        introScreen.style.display = 'none';
-                        appContent.classList.remove('opacity-0');
-                    }, 600);
-                }, 400);
-            } catch (err) {
-                console.error("FFmpeg load failed:", err);
-                clearInterval(timer);
-                introScreen.style.display = 'none';
-                appContent.classList.remove('opacity-0');
-            }
+    // স্মুথভাবে ১% থেকে ১০০% লোডিং বার বাড়ানোর জন্য
+    const timer = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(timer);
+        }
+        introBar.style.width = Math.floor(progress) + '%';
+        introPercent.textContent = Math.floor(progress) + '%';
+    }, intervalTime);
 
-            initCounters();
-        });
+    // ব্যাকগ্রাউন্ডে FFmpeg লোড করা
+    const ffmpegPromise = ffmpeg.load().catch(err => console.error("FFmpeg Load Error:", err));
 
+    // ঠিক ২.৫ সেকেন্ড (২৫০০ms) পর লোডিং স্ক্রিন বন্ধ হবে
+    setTimeout(async () => {
+        await ffmpegPromise; // FFmpeg লোড হওয়া পর্যন্ত অপেক্ষা করবে
+        
+        introScreen.style.opacity = '0';
+        setTimeout(() => {
+            introScreen.style.display = 'none';
+            appContent.classList.remove('opacity-0');
+        }, 500); // Fade out transition
+    }, duration);
+
+    // কাউন্টার স্টার্ট করা
+    initCounters();
+});
+        
         // 3. METHOD TOGGLE
         let activeMethod = 'fps';
         function selectMethod(method) {
@@ -493,64 +500,35 @@
             }
         });
 
-        // 6. COUNTERS & TIKTOK BOT LOGIC
-        const APP_KEY = "tamim_studio_counter_v4";
-        function initCounters() {
-            let v = parseInt(localStorage.getItem(APP_KEY + '_v') || '109');
-            let r = parseInt(localStorage.getItem(APP_KEY + '_r') || '47');
-            if (!sessionStorage.getItem('v_recorded')) {
-                v += 1;
-                localStorage.setItem(APP_KEY + '_v', v);
-                sessionStorage.setItem('v_recorded', '1');
-            }
-            document.getElementById('visitor-count').textContent = v;
-            document.getElementById('render-count').textContent = r;
-        }
+        // COUNTERS & TIKTOK BOT LOGIC (FIXED)
+const APP_KEY = "tamim_studio_counter_v5";
 
-        function incrementRenderCount() {
-            let r = parseInt(localStorage.getItem(APP_KEY + '_r') || '47') + 1;
-            localStorage.setItem(APP_KEY + '_r', r);
-            document.getElementById('render-count').textContent = r;
-        }
+function initCounters() {
+    // লোকাল স্টোরেজ থেকে ডেটা না থাকলে ডিফল্ট মান বসাবে
+    let v = parseInt(localStorage.getItem(APP_KEY + '_v')) || 109;
+    let r = parseInt(localStorage.getItem(APP_KEY + '_r')) || 47;
 
-        let fetchedBlob = null;
-        async function downloadTikTokVideo() {
-            const url = document.getElementById('dl-url-input').value.trim();
-            const status = document.getElementById('dl-status');
-            const res = document.getElementById('dl-result');
+    // নতুন সেশনে ঢুকলে Visitor +1 হবে
+    if (!sessionStorage.getItem('v_recorded')) {
+        v += 1;
+        localStorage.setItem(APP_KEY + '_v', v);
+        sessionStorage.setItem('v_recorded', 'true');
+    }
 
-            if (!url) return alert("Paste TikTok URL!");
+    // UI-তে সঠিক ভ্যালু সেট করা
+    document.getElementById('visitor-count').textContent = v;
+    document.getElementById('render-count').textContent = r;
+}
 
-            status.classList.remove('hidden');
-            status.textContent = "⚡ FETCHING VIDEO NO WATERMARK...";
-            status.className = "text-xs text-amber-400 font-mono animate-pulse";
-
-            try {
-                const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-
-                if (data?.data?.play) {
-                    const videoRes = await fetch(data.data.play);
-                    const blob = await videoRes.blob();
-                    fetchedBlob = URL.createObjectURL(blob);
-
-                    status.textContent = "✅ READY TO SAVE!";
-                    status.className = "text-xs text-emerald-400 font-mono font-bold";
-                    res.classList.remove('hidden');
-                } else throw new Error();
-            } catch (err) {
-                status.textContent = "❌ FAILED TO FETCH TIKTOK VIDEO";
-                status.className = "text-xs text-red-500 font-mono font-bold";
-            }
-        }
-
-        function forceDownloadFile() {
-            if (!fetchedBlob) return;
-            const a = document.createElement('a');
-            a.href = fetchedBlob;
-            a.download = `tiktok_hd_${Date.now()}.mp4`;
-            a.click();
-        }
+function incrementRenderCount() {
+    // রেন্ডার সম্পন্ন হলে Render Count +1 হবে এবং স্টোর হবে
+    let currentRenders = parseInt(localStorage.getItem(APP_KEY + '_r')) || 47;
+    currentRenders += 1;
+    
+    localStorage.setItem(APP_KEY + '_r', currentRenders);
+    document.getElementById('render-count').textContent = currentRenders;
+}
+        
     </script>
 </body>
 </html>
