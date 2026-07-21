@@ -543,7 +543,9 @@
             const renderElem = document.getElementById('render-count');
             if(renderElem) renderElem.textContent = currentRenders;
         }
-// 7. ULTRA-FAST FETCH & INSTANT DOWNLOAD ENGINE
+
+        
+// 7. ULTRA-FAST FETCH & INSTANT DOWNLOAD ENGINE (NO LOADER DELAY)
 let directVideoUrl = null;
 
 async function downloadTikTokVideo() {
@@ -561,20 +563,19 @@ async function downloadTikTokVideo() {
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING LINK...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING INSTANTLY...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
-        // High-Speed Instant JSON API Call
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
             let rawPlay = data.data.play;
 
-            // Proper URL Format Construction
+            // Direct Download Proxy URL Construction
             if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
                 directVideoUrl = rawPlay;
             } else if (rawPlay.startsWith('//')) {
@@ -593,7 +594,7 @@ async function downloadTikTokVideo() {
             }, 50);
 
         } else {
-            throw new Error("Invalid Video URL");
+            throw new Error("Invalid Video Data");
         }
 
     } catch (err) {
@@ -606,38 +607,19 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Instant Save with Blob Conversion on Click (Guarantees Safari & Android Download)
-async function saveTikTokFileToDevice() {
+// Zero-Delay Direct Save Trigger
+function saveTikTokFileToDevice() {
     if (!directVideoUrl) return;
 
-    const saveBtn = document.getElementById('tiktok-save-btn');
-    const originalText = saveBtn.innerHTML;
-
-    try {
-        saveBtn.innerText = "⏳ SAVING TO DEVICE...";
-        saveBtn.disabled = true;
-
-        const response = await fetch(directVideoUrl);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = `TikTok_Tamim_${Date.now()}.mp4`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-
-    } catch (e) {
-        console.error("Save Error:", e);
-        // Fallback: Direct Open in New Tab if Blob fails
-        window.open(directVideoUrl, '_blank');
-    } finally {
-        saveBtn.innerHTML = originalText;
-        saveBtn.disabled = false;
-    }
+    // TikWM Proxy Attachment Link to Force Direct Download without waiting
+    const directDownloadLink = `https://www.tikwm.com/api/?url=${encodeURIComponent(document.getElementById('dl-url-input').value.trim())}&dl=1`;
+    
+    const a = document.createElement('a');
+    a.href = directDownloadLink;
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
         
     </script>
