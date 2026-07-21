@@ -586,76 +586,79 @@ renderBtn.addEventListener('click', async () => {
     renderBtn.disabled = true;
     pulseRing.classList.remove('hidden');
     btnText.textContent = "PROCESSING...";
-    statusText.textContent = "PATCHING & RENDER IN PROGRESS";
+    statusText.textContent = "PATCHING AUDIO & VIDEO PIPELINE";
 
     try {
         const video = document.createElement('video');
         video.src = URL.createObjectURL(selectedFile);
+        video.crossOrigin = "anonymous";
         video.playsInline = true;
-        video.muted = true;
-
+        
+        // Audio & Video sync issue resolution
         await new Promise((resolve, reject) => {
             video.onloadedmetadata = () => resolve();
-            video.onerror = () => reject("Error loading video file.");
+            video.onerror = () => reject("Error loading video.");
         });
 
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+        const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
 
-        // 1. ULTRA-HIGH RESOLUTION CONFIGURATION
+        // Resolution Setup (Hybrid Method: 1080p Vertical / 1440p Landscape)
         if (selectedMethod === 'hybrid') {
-            const isSquareOrVertical = video.videoWidth <= video.videoHeight;
-            if (isSquareOrVertical) {
-                // TikTok / Vertical Video (1080x1920 Full HD/2K)
-                canvas.width = 1080;
-                canvas.height = 1920; 
-            } else {
-                // Landscape Video (2560x1440 2K Ultra HD)
-                canvas.width = 2560;
-                canvas.height = 1440;
-            }
+            const isVertical = video.videoWidth <= video.videoHeight;
+            canvas.width = isVertical ? 1080 : 2560;
+            canvas.height = isVertical ? 1920 : 1440;
         } else {
-            // Default Frame Matching
             canvas.width = video.videoWidth || 1280;
             canvas.height = video.videoHeight || 720;
         }
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Web Audio Context setup for Perfect Sound Capture
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+        
+        // Resume AudioContext if suspended
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
         const source = audioCtx.createMediaElementSource(video);
         const dest = audioCtx.createMediaStreamDestination();
+        
+        // Connect to destination stream AND speaker output
         source.connect(dest);
+        source.connect(audioCtx.destination);
 
-        // 2. FIXED FRAME-RATE & HIGH BITRATE SETTINGS
         const targetFPS = selectedMethod === 'fps' ? 120 : 60;
         const canvasStream = canvas.captureStream(targetFPS);
 
+        // Merge smooth canvas stream with captured audio stream
         const combinedStream = new MediaStream([
             ...canvasStream.getVideoTracks(),
             ...dest.stream.getAudioTracks()
         ]);
 
-        const options = {
-            videoBitsPerSecond: 45000000, // 45 Mbps High Fidelity
-            audioBitsPerSecond: 320000   // 320 kbps Studio Audio
-        };
-
+        // Codec & High Bitrate Settings
+        let mimeType = 'video/webm;codecs=vp9,opus';
         if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-            options.mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+            mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
         } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-            options.mimeType = 'video/mp4';
-        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
-            options.mimeType = 'video/webm;codecs=vp9,opus';
+            mimeType = 'video/mp4';
         }
 
-        const recorder = new MediaRecorder(combinedStream, options);
-        const chunks = [];
+        const recorder = new MediaRecorder(combinedStream, {
+            mimeType: mimeType,
+            videoBitsPerSecond: 25000000, // 25 Mbps stable ultra-clear
+            audioBitsPerSecond: 320000   // 320 kbps Crisp Audio
+        });
 
+        const chunks = [];
         recorder.ondataavailable = (e) => {
             if (e.data && e.data.size > 0) chunks.push(e.data);
         };
 
         recorder.onstop = () => {
-            const finalBlob = new Blob(chunks, { type: options.mimeType || 'video/mp4' });
+            const finalBlob = new Blob(chunks, { type: mimeType });
             const videoUrl = URL.createObjectURL(finalBlob);
 
             statusText.textContent = "COMPLETE";
@@ -664,17 +667,50 @@ renderBtn.addEventListener('click', async () => {
 
             outputPlaceholder.classList.add('hidden');
             downloadLink.href = videoUrl;
-            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}_60fps.mp4`;
+            downloadLink.download = `tamim_patched_${Date.now()}.mp4`;
             downloadLink.classList.remove('hidden');
 
             btnText.textContent = "FINISHED";
             pulseRing.classList.add('hidden');
 
+            // Clean up Audio
             audioCtx.close();
-            if (typeof incrementRenderCount === "function") {
-                incrementRenderCount();
-            }
+            incrementRenderCount();
         };
+
+        // Start Recording
+        recorder.start();
+        video.muted = false; // Unmute for AudioContext processing
+        video.volume = 1.0;
+        await video.play();
+
+        const duration = video.duration || 1;
+
+        // Smooth Rendering Engine Loop (No Lag)
+        function processFrame() {
+            if (video.paused || video.ended) {
+                setTimeout(() => { recorder.stop(); }, 300);
+                return;
+            }
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+            percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+            progressBar.style.width = `${pct}%`;
+
+            requestAnimationFrame(processFrame);
+        }
+
+        requestAnimationFrame(processFrame);
+
+    } catch (err) {
+        console.error("Render Error:", err);
+        statusText.textContent = "RENDER ERROR";
+        btnText.textContent = "FAILED";
+        pulseRing.classList.add('hidden');
+    }
+});
 
         // 3. START RECORDING & RENDER LOOP
         recorder.start();
@@ -738,51 +774,47 @@ if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
 }
 
         // 5. REAL-TIME COUNTER LOGIC (UNIQUE VISITORS)
-const USERNAME = 'tamim_patcher';
+// Unique Visitors & Render Counter (Fixed Counter API)
+const NAMESPACE = "tamim_x_patcher_v1"; 
 
-// চেক করা হচ্ছে ইউজার আগে ভিজিট করেছে কিনা
-if (!localStorage.getItem('visited_' + USERNAME)) {
-    // প্রথমবার ভিজিট করলে কাউন্ট ১ বাড়াবে
-    fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors/up`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.count) {
-                document.getElementById('visitor-count').innerText = data.count;
-            }
-            // ব্রাউজারে মার্ক করে রাখা হলো যে ইউজার ভিজিট করেছে
-            localStorage.setItem('visited_' + USERNAME, 'true');
-        })
-        .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
-} else {
-    // আগের ভিজিটর হলে শুধু বর্তমান সংখ্যাটি নিয়ে এসে দেখাবে (বাড়াবে না)
-    fetch(`https://api.counterapi.dev/v1/${USERNAME}/visitors`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.count) {
-                document.getElementById('visitor-count').innerText = data.count;
-            }
-        })
-        .catch(() => { document.getElementById('visitor-count').innerText = '1'; });
+async function initCounters() {
+    try {
+        // Increment visitor count once per session
+        if (!sessionStorage.getItem('visited')) {
+            await fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/visitors/up`);
+            sessionStorage.setItem('visited', 'true');
+        }
+        
+        const vRes = await fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/visitors`);
+        const vData = await vRes.json();
+        if (vData && vData.count !== undefined) {
+            document.getElementById('visitor-count').textContent = vData.count;
+        }
+
+        const rRes = await fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/patched`);
+        const rData = await rRes.json();
+        if (rData && rData.count !== undefined) {
+            document.getElementById('render-count').textContent = rData.count;
+        }
+    } catch (e) {
+        console.log("Counter Error:", e);
+    }
 }
 
-// রেন্ডার সংখ্যা পড়া
-fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders`)
-    .then(res => res.json())
-    .then(data => {
-        if (data && data.count) document.getElementById('render-count').innerText = data.count;
-        else document.getElementById('render-count').innerText = '0';
-    })
-    .catch(() => { document.getElementById('render-count').innerText = '0'; });
-
-// রেন্ডার সফল হলে কাউন্ট বাড়ানো
-function incrementRenderCount() {
-    fetch(`https://api.counterapi.dev/v1/${USERNAME}/renders/up`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.count) document.getElementById('render-count').innerText = data.count;
-        });
+async function incrementRenderCount() {
+    try {
+        const res = await fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/patched/up`);
+        const data = await res.json();
+        if (data && data.count !== undefined) {
+            document.getElementById('render-count').textContent = data.count;
+        }
+    } catch (e) {
+        console.log("Render Count Error:", e);
+    }
 }
 
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initCounters);
 
 let fetchedVideoBlobUrl = null;
 
