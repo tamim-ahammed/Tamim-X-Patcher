@@ -209,10 +209,11 @@
         <!-- TIMELINE STEPS -->
         <div class="space-y-8">
 
-            <!-- STEP 00: TIKTOK BOT (UPDATED ANIMATED UI) -->
-<div class="glass-panel gold-glow-card p-6 rounded-3xl relative overflow-hidden transition-all hover:border-amber-400/50">
-    <!-- Animated Light Beam Effect -->
-    <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl animate-pulse"></div>
+           <!-- STEP 00: TIKTOK BOT (ULTRA ANIMATED UI) -->
+<div class="glass-panel gold-glow-card p-6 rounded-3xl relative overflow-hidden transition-all hover:border-amber-400/60 duration-500 group">
+    <!-- Ambient Background Glow Animation -->
+    <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-500/15 rounded-full blur-2xl group-hover:scale-150 transition-all duration-700 pointer-events-none"></div>
+    <div class="absolute -bottom-12 -left-12 w-28 h-28 bg-orange-500/15 rounded-full blur-2xl group-hover:scale-150 transition-all duration-700 pointer-events-none"></div>
 
     <div class="flex items-center justify-between mb-4 relative z-10">
         <div class="flex items-center gap-2">
@@ -235,12 +236,12 @@
         <!-- Animated Status Text -->
         <div id="dl-status" class="text-xs font-mono hidden transition-all duration-300"></div>
 
-        <!-- Result Download UI -->
-        <div id="dl-result" class="hidden transform transition-all duration-500 scale-95 opacity-0">
-            <a id="tiktok-download-btn" href="#" target="_blank" rel="noopener noreferrer"
-               class="block w-full text-center bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 active:scale-98 text-slate-950 font-black py-3 rounded-xl text-xs font-mono uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all">
-                ⬇️ DOWNLOAD NO-WATERMARK VIDEO
-            </a>
+        <!-- Download Button Block -->
+        <div id="dl-result" class="hidden transition-all duration-500 transform scale-90 opacity-0">
+            <button id="tiktok-save-btn" onclick="saveTikTokFileToDevice()"
+                    class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:brightness-110 active:scale-95 text-slate-950 font-black py-3.5 rounded-xl text-xs font-mono uppercase tracking-wider shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2">
+                <span>⬇️ SAVE VIDEO TO GALLERY / DEVICE</span>
+            </button>
         </div>
     </div>
 </div>
@@ -537,14 +538,14 @@ function incrementRenderCount() {
     document.getElementById('render-count').textContent = currentRenders;
 }
 
+// FIXED TIKTOK FETCH & BLOB DOWNLOAD LOGIC
+let fetchedVideoBlobUrl = null;
 
- // FIXED TIKTOK FETCH & DOWNLOAD LOGIC
 async function downloadTikTokVideo() {
     const urlInput = document.getElementById('dl-url-input');
     const url = urlInput.value.trim();
     const status = document.getElementById('dl-status');
     const resContainer = document.getElementById('dl-result');
-    const dlBtn = document.getElementById('tiktok-download-btn');
     const fetchBtn = document.getElementById('dl-btn');
 
     if (!url) {
@@ -552,59 +553,73 @@ async function downloadTikTokVideo() {
         return;
     }
 
-    // UI Feedback: Loading
+    // UI Reset and Loading Animation
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING VIDEO DATA...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span> DOWNLOADING VIDEO FILE...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
-    // Reset output container
-    resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
+    resContainer.classList.add('hidden', 'scale-90', 'opacity-0');
 
     try {
-        // Multi-API Fallback System (Prevents CORS or API Rate Limit blocks)
-        let videoUrl = null;
+        let rawVideoUrl = null;
 
-        // Try API 1: TikWM
+        // API Fetch Logic
         try {
             const api1 = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
             const data1 = await api1.json();
-            if (data1?.data?.play) videoUrl = data1.data.play;
+            if (data1?.data?.play) rawVideoUrl = data1.data.play;
         } catch (e) {}
 
-        // Fallback API 2: SSSTik / Secondary Proxy API if TikWM fails
-        if (!videoUrl) {
+        if (!rawVideoUrl) {
             const api2 = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
             const data2 = await api2.json();
-            if (data2?.video?.noWatermark) videoUrl = data2.video.noWatermark;
+            if (data2?.video?.noWatermark) rawVideoUrl = data2.video.noWatermark;
         }
 
-        if (videoUrl) {
-            // Set Direct Download Link
-            dlBtn.href = videoUrl;
+        if (rawVideoUrl) {
+            // Converts Video into Blob (Forces genuine device file download)
+            const videoResponse = await fetch(rawVideoUrl);
+            const videoBlob = await videoResponse.blob();
+            
+            if (fetchedVideoBlobUrl) URL.revokeObjectURL(fetchedVideoBlobUrl);
+            fetchedVideoBlobUrl = URL.createObjectURL(videoBlob);
 
-            // Success UI Animation
-            status.innerHTML = "✅ VIDEO READY FOR DOWNLOAD!";
-            status.className = "text-xs text-emerald-400 font-mono font-bold animate-bounce";
+            // Status UI Update with Pop-in Animation
+            status.innerHTML = "✅ READY TO SAVE TO DEVICE!";
+            status.className = "text-xs text-emerald-400 font-mono font-bold animate-pulse";
             
             resContainer.classList.remove('hidden');
             setTimeout(() => {
-                resContainer.classList.remove('scale-95', 'opacity-0');
+                resContainer.classList.remove('scale-90', 'opacity-0');
                 resContainer.classList.add('scale-100', 'opacity-100');
             }, 50);
+
         } else {
             throw new Error("Unable to fetch video");
         }
 
     } catch (err) {
         console.error(err);
-        status.innerHTML = "❌ FAILED! CHECK LINK OR TRY AGAIN.";
+        status.innerHTML = "❌ FAILED TO DOWNLOAD! CHECK LINK OR TRY AGAIN.";
         status.className = "text-xs text-red-500 font-mono font-bold";
     } finally {
         fetchBtn.disabled = false;
         fetchBtn.classList.remove('opacity-50');
     }
+}
+
+// Function to trigger direct device download
+function saveTikTokFileToDevice() {
+    if (!fetchedVideoBlobUrl) return;
+
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = fetchedVideoBlobUrl;
+    downloadAnchor.download = `TikTok_Tamim_Patcher_${Date.now()}.mp4`;
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
 }
         
         
