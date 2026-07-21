@@ -543,8 +543,8 @@
             const renderElem = document.getElementById('render-count');
             if(renderElem) renderElem.textContent = currentRenders;
         }
-// 7. ULTRA-FAST & ACCURATE TIKTOK DOWNLOAD ENGINE
-let directStreamBlobUrl = null;
+// 7. ULTRA-FAST FETCH & INSTANT DOWNLOAD ENGINE
+let directVideoUrl = null;
 
 async function downloadTikTokVideo() {
     const urlInput = document.getElementById('dl-url-input');
@@ -561,35 +561,29 @@ async function downloadTikTokVideo() {
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FAST FETCHING & PROCESSING...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING LINK...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
+        // High-Speed Instant JSON API Call
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
             let rawPlay = data.data.play;
-            let finalVideoUrl = "";
 
+            // Proper URL Format Construction
             if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
-                finalVideoUrl = rawPlay;
+                directVideoUrl = rawPlay;
             } else if (rawPlay.startsWith('//')) {
-                finalVideoUrl = `https:${rawPlay}`;
+                directVideoUrl = `https:${rawPlay}`;
             } else {
-                finalVideoUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
+                directVideoUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
             }
 
-            // High-Speed Direct Stream Fetch to Blob (Forces Gallery Save on iOS/Android)
-            const videoStream = await fetch(finalVideoUrl);
-            const videoBlob = await videoStream.blob();
-            
-            if (directStreamBlobUrl) URL.revokeObjectURL(directStreamBlobUrl);
-            directStreamBlobUrl = URL.createObjectURL(videoBlob);
-
-            status.innerHTML = "⚡ FAST READY! SAVE DIRECTLY TO DEVICE";
+            status.innerHTML = "⚡ FETCH SUCCESSFUL! CLICK SAVE BELOW";
             status.className = "text-xs text-emerald-400 font-mono font-bold";
             
             resContainer.classList.remove('hidden');
@@ -599,7 +593,7 @@ async function downloadTikTokVideo() {
             }, 50);
 
         } else {
-            throw new Error("Invalid Video Data");
+            throw new Error("Invalid Video URL");
         }
 
     } catch (err) {
@@ -612,16 +606,38 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Direct Instant Device Save Trigger
-function saveTikTokFileToDevice() {
-    if (!directStreamBlobUrl) return;
-    
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.href = directStreamBlobUrl;
-    downloadAnchor.download = `TikTok_Tamim_${Date.now()}.mp4`;
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
+// Instant Save with Blob Conversion on Click (Guarantees Safari & Android Download)
+async function saveTikTokFileToDevice() {
+    if (!directVideoUrl) return;
+
+    const saveBtn = document.getElementById('tiktok-save-btn');
+    const originalText = saveBtn.innerHTML;
+
+    try {
+        saveBtn.innerText = "⏳ SAVING TO DEVICE...";
+        saveBtn.disabled = true;
+
+        const response = await fetch(directVideoUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `TikTok_Tamim_${Date.now()}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+    } catch (e) {
+        console.error("Save Error:", e);
+        // Fallback: Direct Open in New Tab if Blob fails
+        window.open(directVideoUrl, '_blank');
+    } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    }
 }
         
     </script>
