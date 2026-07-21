@@ -311,8 +311,8 @@
                                     ● ACTIVE
                                 </span>
                             </div>
-                            <h4 class="font-bold text-white tracking-wide text-base">FPS METHOD (60/120 FPS)</h4>
-                            <p class="text-xs text-slate-400 mono mt-1">— Original Ratio & Smooth Motion</p>
+                            <h4 class="font-bold text-white tracking-wide text-base">FPS METHOD (60 FPS)</h4>
+                            <p class="text-xs text-slate-400 mono mt-1">— Fast Render & Standard Quality</p>
                         </div>
 
                         <div id="method-hybrid" onclick="selectMethod('hybrid')" 
@@ -323,8 +323,8 @@
                                     STANDBY
                                 </span>
                             </div>
-                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (HIGH QUALITY)</h4>
-                            <p class="text-xs text-slate-400 mono mt-1">— Auto Scaled Quality & Bitrate Boost</p>
+                            <h4 class="font-bold text-slate-200 tracking-wide text-base">HYBRID METHOD (1080p/2K & 60 FPS)</h4>
+                            <p class="text-xs text-slate-400 mono mt-1">— Ultra HD Quality Boost, Smooth 60FPS & Perfect Ratio</p>
                         </div>
                     </div>
                 </div>
@@ -542,7 +542,7 @@
             });
         }
 
-        // 5. FIXED SMOOTH VIDEO RENDER ENGINE
+        // 5. ULTRA-SMOOTH 60 FPS & 1080p/2K HYBRID RENDER ENGINE
         if (renderBtn) {
             renderBtn.addEventListener('click', async () => {
                 if (!selectedFile) return;
@@ -550,7 +550,7 @@
                 renderBtn.disabled = true;
                 pulseRing.classList.remove('hidden');
                 btnText.textContent = "PROCESSING...";
-                statusText.textContent = "PROCESSING VIDEO & AUDIO";
+                statusText.textContent = "PROCESSING ULTRA-HD 60FPS VIDEO";
 
                 try {
                     const video = document.createElement('video');
@@ -564,11 +564,31 @@
                         video.onerror = () => reject("Video Load Error");
                     });
 
-                    // FIX: Always maintain EXACT original aspect ratio & video size
+                    // Hybrid Method: Force 1080p/1440p High Quality Resolution
+                    let targetWidth = video.videoWidth || 1080;
+                    let targetHeight = video.videoHeight || 1920;
+
+                    if (selectedMethod === 'hybrid') {
+                        // Maintain Aspect Ratio while upscaling to 1080p minimum width/height
+                        if (targetWidth < 1080 && targetWidth <= targetHeight) {
+                            const scale = 1080 / targetWidth;
+                            targetWidth = 1080;
+                            targetHeight = Math.round(targetHeight * scale);
+                        } else if (targetHeight < 1080 && targetHeight < targetWidth) {
+                            const scale = 1080 / targetHeight;
+                            targetHeight = 1080;
+                            targetWidth = Math.round(targetWidth * scale);
+                        }
+                    }
+
+                    // Make dimensions even (Required for MP4 encoders)
+                    targetWidth = targetWidth % 2 === 0 ? targetWidth : targetWidth - 1;
+                    targetHeight = targetHeight % 2 === 0 ? targetHeight : targetHeight - 1;
+
                     const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth || 720;
-                    canvas.height = video.videoHeight || 1280;
-                    const ctx = canvas.getContext('2d', { alpha: false });
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
 
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     const audioCtx = new AudioContext();
@@ -582,15 +602,16 @@
                     source.connect(dest);
                     source.connect(audioCtx.destination);
 
-                    const fps = selectedMethod === 'fps' ? 60 : 30;
-                    const canvasStream = canvas.captureStream(fps);
+                    // ALWAYS 60 FPS FOR HYBRID AND FPS METHOD
+                    const targetFPS = 60;
+                    const canvasStream = canvas.captureStream(targetFPS);
 
                     const combinedStream = new MediaStream([
                         ...canvasStream.getVideoTracks(),
                         ...dest.stream.getAudioTracks()
                     ]);
 
-                    // FIX: Mobile-compatible codec check
+                    // Codec Selection for Mobile/Gallery Smooth Playback
                     let mimeType = 'video/webm;codecs=vp8,opus';
                     if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
                         mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
@@ -600,9 +621,12 @@
                         mimeType = 'video/webm';
                     }
 
+                    // High Bitrate Boost for 1080p/2K Sharp Quality (18 Mbps)
+                    const bitRate = selectedMethod === 'hybrid' ? 18000000 : 8000000;
+
                     const recorder = new MediaRecorder(combinedStream, {
                         mimeType: mimeType,
-                        videoBitsPerSecond: selectedMethod === 'hybrid' ? 12000000 : 8000000
+                        videoBitsPerSecond: bitRate
                     });
 
                     const chunks = [];
@@ -635,6 +659,7 @@
 
                     const duration = video.duration || 1;
 
+                    // Smooth Precision Rendering Loop
                     function renderLoop() {
                         if (video.paused || video.ended) {
                             setTimeout(() => { recorder.stop(); }, 200);
