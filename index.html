@@ -545,8 +545,8 @@
         }
 
         
-// 7. ULTRA-FAST FETCH & REAL FILE DOWNLOAD ENGINE
-let directVideoUrl = null;
+// 7. DIRECT SAME-SITE FAST TIKTOK ENGINE (NO REDIRECTS)
+let rawVideoUrl = null;
 
 async function downloadTikTokVideo() {
     const urlInput = document.getElementById('dl-url-input');
@@ -563,29 +563,28 @@ async function downloadTikTokVideo() {
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING INSTANTLY...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING DIRECT LINK...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
-        // Fast JSON Fetching
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
             let rawPlay = data.data.play;
 
-            // Proper URL Construction
+            // Normalize URL format
             if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
-                directVideoUrl = rawPlay;
+                rawVideoUrl = rawPlay;
             } else if (rawPlay.startsWith('//')) {
-                directVideoUrl = `https:${rawPlay}`;
+                rawVideoUrl = `https:${rawPlay}`;
             } else {
-                directVideoUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
+                rawVideoUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
             }
 
-            status.innerHTML = "⚡ FETCH SUCCESSFUL! CLICK SAVE BELOW";
+            status.innerHTML = "⚡ FETCH SUCCESSFUL! CLICK BELOW TO SAVE";
             status.className = "text-xs text-emerald-400 font-mono font-bold";
             
             resContainer.classList.remove('hidden');
@@ -608,19 +607,50 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Direct File Force Download Proxy (Fixes JSON Screen Bug)
-function saveTikTokFileToDevice() {
-    if (!directVideoUrl) return;
+// In-Site Direct Downloader Engine (No External Redirects)
+async function saveTikTokFileToDevice() {
+    if (!rawVideoUrl) return;
 
-    // Direct TikWM download proxy stream that forces video/mp4 headers
-    const proxyDownloadUrl = `https://www.tikwm.com/download.php?url=${encodeURIComponent(directVideoUrl)}`;
-    
-    const a = document.createElement('a');
-    a.href = proxyDownloadUrl;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const saveBtn = document.getElementById('tiktok-save-btn');
+    const originalContent = saveBtn.innerHTML;
+
+    try {
+        saveBtn.innerText = "⏳ DOWNLOADING FILE DIRECTLY...";
+        saveBtn.disabled = true;
+
+        // Fetch video bytes directly to bypass page redirection
+        const response = await fetch(rawVideoUrl);
+        if (!response.ok) throw new Error("Network response error");
+        
+        const videoBlob = await response.blob();
+        
+        // Force MIME type to video/mp4 for mobile gallery support
+        const cleanBlob = new Blob([videoBlob], { type: 'video/mp4' });
+        const localBlobUrl = URL.createObjectURL(cleanBlob);
+
+        // Download trigger directly on current page
+        const downloadLink = document.createElement('a');
+        downloadLink.href = localBlobUrl;
+        downloadLink.download = `TikTok_Tamim_${Date.now()}.mp4`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        // Cleanup local memory after download initialization
+        setTimeout(() => URL.revokeObjectURL(localBlobUrl), 10000);
+
+    } catch (e) {
+        console.error("In-Site Download Error:", e);
+        // Clean fallback using invisible iframe download (no site navigation)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = rawVideoUrl;
+        document.body.appendChild(iframe);
+        setTimeout(() => document.body.removeChild(iframe), 5000);
+    } finally {
+        saveBtn.innerHTML = originalContent;
+        saveBtn.disabled = false;
+    }
 }
         
     </script>
