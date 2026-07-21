@@ -544,69 +544,78 @@
             if(renderElem) renderElem.textContent = currentRenders;
         }
 
-        // 7. ULTRA-FAST TIKTOK FETCH ENGINE
-        let directVideoUrl = null;
+        // 7. ULTRA-FAST TIKTOK FETCH & DIRECT BLOB DOWNLOAD ENGINE
+let tiktokBlobUrl = null;
 
-        async function downloadTikTokVideo() {
-            const urlInput = document.getElementById('dl-url-input');
-            const url = urlInput.value.trim();
-            const status = document.getElementById('dl-status');
-            const resContainer = document.getElementById('dl-result');
-            const fetchBtn = document.getElementById('dl-btn');
+async function downloadTikTokVideo() {
+    const urlInput = document.getElementById('dl-url-input');
+    const url = urlInput.value.trim();
+    const status = document.getElementById('dl-status');
+    const resContainer = document.getElementById('dl-result');
+    const fetchBtn = document.getElementById('dl-btn');
 
-            if (!url) {
-                alert("Please paste a valid TikTok link!");
-                return;
-            }
+    if (!url) {
+        alert("Please paste a valid TikTok link!");
+        return;
+    }
 
-            fetchBtn.disabled = true;
-            fetchBtn.classList.add('opacity-50');
-            status.classList.remove('hidden');
-            status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FAST FETCHING...</span>`;
-            status.className = "text-xs text-amber-400 font-mono font-bold";
+    fetchBtn.disabled = true;
+    fetchBtn.classList.add('opacity-50');
+    status.classList.remove('hidden');
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> DOWNLOADING VIDEO FILE...</span>`;
+    status.className = "text-xs text-amber-400 font-mono font-bold";
+    
+    resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
+
+    try {
+        const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+        const data = await apiRes.json();
+
+        if (data?.data?.play) {
+            const videoUrl = data.data.play;
+
+            // Direct fetch and convert to Blob to force gallery/device saving
+            const blobRes = await fetch(videoUrl);
+            const blobData = await blobRes.blob();
             
-            resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
+            if (tiktokBlobUrl) URL.revokeObjectURL(tiktokBlobUrl);
+            tiktokBlobUrl = URL.createObjectURL(blobData);
 
-            try {
-                const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-                const data = await apiRes.json();
+            status.innerHTML = "⚡ READY TO SAVE TO DEVICE!";
+            status.className = "text-xs text-emerald-400 font-mono font-bold";
+            
+            resContainer.classList.remove('hidden');
+            setTimeout(() => {
+                resContainer.classList.remove('scale-95', 'opacity-0');
+                resContainer.classList.add('scale-100', 'opacity-100');
+            }, 50);
 
-                if (data?.data?.play) {
-                    directVideoUrl = data.data.play;
-
-                    status.innerHTML = "⚡ READY TO DOWNLOAD!";
-                    status.className = "text-xs text-emerald-400 font-mono font-bold";
-                    
-                    resContainer.classList.remove('hidden');
-                    setTimeout(() => {
-                        resContainer.classList.remove('scale-95', 'opacity-0');
-                        resContainer.classList.add('scale-100', 'opacity-100');
-                    }, 50);
-
-                } else {
-                    throw new Error();
-                }
-
-            } catch (err) {
-                status.innerHTML = "❌ FETCH FAILED! PLEASE RE-PASTE LINK.";
-                status.className = "text-xs text-red-500 font-mono font-bold";
-            } finally {
-                fetchBtn.disabled = false;
-                fetchBtn.classList.remove('opacity-50');
-            }
+        } else {
+            throw new Error("Unable to fetch video source");
         }
 
-        // Direct Save Trigger
-        function saveTikTokFileToDevice() {
-            if (!directVideoUrl) return;
-            const a = document.createElement('a');
-            a.href = directVideoUrl;
-            a.target = "_blank";
-            a.download = `TikTok_Tamim_${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+    } catch (err) {
+        console.error("TikTok Download Error:", err);
+        status.innerHTML = "❌ FETCH FAILED! CHECK LINK OR TRY AGAIN.";
+        status.className = "text-xs text-red-500 font-mono font-bold";
+    } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.classList.remove('opacity-50');
+    }
+}
+
+// Direct File Save Trigger (Saves straight to File System / Gallery)
+function saveTikTokFileToDevice() {
+    if (!tiktokBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = tiktokBlobUrl;
+    a.download = `TikTok_Tamim_${Date.now()}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+        
     </script>
 </body>
 </html>
