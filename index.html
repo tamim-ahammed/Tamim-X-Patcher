@@ -544,7 +544,7 @@
             if(renderElem) renderElem.textContent = currentRenders;
         }
 
-        // 7. LIGHTNING FAST TIKTOK DOWNLOAD ENGINE (NO WAITING / INSTANT SAVE)
+        // 7. ULTRA-FAST & BUG-FIXED TIKTOK DOWNLOAD ENGINE
 let fastDownloadUrl = null;
 
 async function downloadTikTokVideo() {
@@ -568,13 +568,20 @@ async function downloadTikTokVideo() {
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
-        // High-Speed Fast API
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
-            // Direct Stream URL using tikwm's forced attachment headers (Super Fast)
-            fastDownloadUrl = `https://www.tikwm.com${data.data.play}?hd=1`;
+            let rawPlay = data.data.play;
+
+            // URL Syntax Fix (Duplicate Domain Prevention)
+            if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
+                fastDownloadUrl = rawPlay;
+            } else if (rawPlay.startsWith('//')) {
+                fastDownloadUrl = `https:${rawPlay}`;
+            } else {
+                fastDownloadUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
+            }
 
             status.innerHTML = "⚡ READY FOR FAST SAVE!";
             status.className = "text-xs text-emerald-400 font-mono font-bold";
@@ -586,7 +593,7 @@ async function downloadTikTokVideo() {
             }, 50);
 
         } else {
-            throw new Error("Unable to parse video URL");
+            throw new Error("Invalid Video Data");
         }
 
     } catch (err) {
@@ -599,7 +606,7 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Instant Direct Save Trigger
+// Direct Instant Save Trigger
 function saveTikTokFileToDevice() {
     if (!fastDownloadUrl) return;
     
