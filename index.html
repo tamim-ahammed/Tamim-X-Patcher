@@ -544,8 +544,8 @@
             if(renderElem) renderElem.textContent = currentRenders;
         }
 
-        // 7. ULTRA-FAST TIKTOK FETCH & DIRECT BLOB DOWNLOAD ENGINE
-let tiktokBlobUrl = null;
+        // 7. LIGHTNING FAST TIKTOK DOWNLOAD ENGINE (NO WAITING / INSTANT SAVE)
+let fastDownloadUrl = null;
 
 async function downloadTikTokVideo() {
     const urlInput = document.getElementById('dl-url-input');
@@ -562,26 +562,21 @@ async function downloadTikTokVideo() {
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> DOWNLOADING VIDEO FILE...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING INSTANTLY...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
+        // High-Speed Fast API
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
-            const videoUrl = data.data.play;
+            // Direct Stream URL using tikwm's forced attachment headers (Super Fast)
+            fastDownloadUrl = `https://www.tikwm.com${data.data.play}?hd=1`;
 
-            // Direct fetch and convert to Blob to force gallery/device saving
-            const blobRes = await fetch(videoUrl);
-            const blobData = await blobRes.blob();
-            
-            if (tiktokBlobUrl) URL.revokeObjectURL(tiktokBlobUrl);
-            tiktokBlobUrl = URL.createObjectURL(blobData);
-
-            status.innerHTML = "⚡ READY TO SAVE TO DEVICE!";
+            status.innerHTML = "⚡ READY FOR FAST SAVE!";
             status.className = "text-xs text-emerald-400 font-mono font-bold";
             
             resContainer.classList.remove('hidden');
@@ -591,11 +586,11 @@ async function downloadTikTokVideo() {
             }, 50);
 
         } else {
-            throw new Error("Unable to fetch video source");
+            throw new Error("Unable to parse video URL");
         }
 
     } catch (err) {
-        console.error("TikTok Download Error:", err);
+        console.error("TikTok Fetch Error:", err);
         status.innerHTML = "❌ FETCH FAILED! CHECK LINK OR TRY AGAIN.";
         status.className = "text-xs text-red-500 font-mono font-bold";
     } finally {
@@ -604,17 +599,18 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Direct File Save Trigger (Saves straight to File System / Gallery)
+// Instant Direct Save Trigger
 function saveTikTokFileToDevice() {
-    if (!tiktokBlobUrl) return;
+    if (!fastDownloadUrl) return;
+    
     const a = document.createElement('a');
-    a.href = tiktokBlobUrl;
-    a.download = `TikTok_Tamim_${Date.now()}.mp4`;
+    a.href = fastDownloadUrl;
+    a.target = '_blank';
+    a.setAttribute('download', `TikTok_Tamim_${Date.now()}.mp4`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 }
-
         
     </script>
 </body>
