@@ -577,128 +577,144 @@
         }
 
         if (renderBtn) {
-            renderBtn.addEventListener('click', async () => {
-                if (!selectedFile) return;
+            // ==========================================
+// OPTIMIZED HIGH-PERFORMANCE RENDER ENGINE
+// ==========================================
+renderBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
 
-                renderBtn.disabled = true;
-                if (pulseRing) pulseRing.classList.remove('hidden');
-                if (btnText) btnText.textContent = "WORKING";
-                if (statusText) statusText.textContent = "PROCESSING VIDEO";
+    renderBtn.disabled = true;
+    pulseRing.classList.remove('hidden');
+    btnText.textContent = "PROCESSING...";
+    statusText.textContent = "PATCHING & RENDER IN PROGRESS";
 
-                try {
-                    const video = document.createElement('video');
-                    video.src = URL.createObjectURL(selectedFile);
-                    video.playsInline = true;
-                    video.muted = true;
+    try {
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(selectedFile);
+        video.playsInline = true;
+        video.muted = true;
 
-                    await new Promise((resolve, reject) => {
-                        video.onloadedmetadata = () => resolve();
-                        video.onerror = () => reject("Error loading video file.");
-                    });
+        await new Promise((resolve, reject) => {
+            video.onloadedmetadata = () => resolve();
+            video.onerror = () => reject("Error loading video file.");
+        });
 
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 
-                    if (selectedMethod === 'hybrid') {
-                        if (video.videoWidth === video.videoHeight) {
-                            canvas.width = 1080;
-                            canvas.height = 1080;
-                        } else {
-                            const scale = 1080 / (video.videoHeight || 1080);
-                            canvas.width = Math.round((video.videoWidth || 1920) * scale);
-                            canvas.height = 1080;
-                        }
-                    } else {
-                        canvas.width = video.videoWidth || 1280;
-                        canvas.height = video.videoHeight || 720;
-                    }
-
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const source = audioCtx.createMediaElementSource(video);
-                    const dest = audioCtx.createMediaStreamDestination();
-                    source.connect(dest);
-
-                    const targetFPS = selectedMethod === 'fps' ? 120 : 60;
-                    const canvasStream = canvas.captureStream(targetFPS);
-
-                    const combinedStream = new MediaStream([
-                        ...canvasStream.getVideoTracks(),
-                        ...dest.stream.getAudioTracks()
-                    ]);
-
-                    let mimeType = 'video/mp4';
-                    const options = { videoBitsPerSecond: 25000000 };
-
-                    if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-                        options.mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
-                    } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-                        options.mimeType = 'video/mp4';
-                    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
-                        options.mimeType = 'video/webm;codecs=vp9,opus';
-                    }
-
-                    const recorder = new MediaRecorder(combinedStream, options);
-                    const chunks = [];
-
-                    recorder.ondataavailable = (e) => {
-                        if (e.data && e.data.size > 0) chunks.push(e.data);
-                    };
-
-                    recorder.onstop = () => {
-                        const finalBlob = new Blob(chunks, { type: options.mimeType || 'video/mp4' });
-                        const videoUrl = URL.createObjectURL(finalBlob);
-
-                        if (statusText) statusText.textContent = "COMPLETE";
-                        if (percentageText) percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
-                        if (progressBar) progressBar.style.width = `100%`;
-
-                        if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
-                        if (downloadLink) {
-                            downloadLink.href = videoUrl;
-                            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}.mp4`;
-                            downloadLink.classList.remove('hidden');
-                        }
-
-                        if (btnText) btnText.textContent = "DONE";
-                        if (pulseRing) pulseRing.classList.add('hidden');
-                        
-                        audioCtx.close();
-                        incrementRenderCount(); // রেন্ডার শেষ হলে কাউন্টার বাড়বে
-                    };
-
-                    recorder.start();
-                    await video.play();
-
-                    const duration = video.duration || 1;
-
-                    function renderLoop() {
-                        if (video.paused || video.ended) {
-                            recorder.stop();
-                            return;
-                        }
-
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
-                        if (percentageText) percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
-                        if (progressBar) progressBar.style.width = `${pct}%`;
-
-                        requestAnimationFrame(renderLoop);
-                    }
-
-                    renderLoop();
-
-                } catch (err) {
-                    console.error("Render Failure:", err);
-                    if (statusText) {
-                        statusText.textContent = "RENDER ERROR";
-                        statusText.className = "text-xs font-bold text-red-500 mono";
-                    }
-                    if (btnText) btnText.textContent = "FAILED";
-                    if (pulseRing) pulseRing.classList.add('hidden');
-                }
-            });
+        // 1. ULTRA-HIGH RESOLUTION CONFIGURATION
+        if (selectedMethod === 'hybrid') {
+            const isSquareOrVertical = video.videoWidth <= video.videoHeight;
+            if (isSquareOrVertical) {
+                // TikTok / Vertical Video (1080x1920 Full HD/2K)
+                canvas.width = 1080;
+                canvas.height = 1920; 
+            } else {
+                // Landscape Video (2560x1440 2K Ultra HD)
+                canvas.width = 2560;
+                canvas.height = 1440;
+            }
+        } else {
+            // Default Frame Matching
+            canvas.width = video.videoWidth || 1280;
+            canvas.height = video.videoHeight || 720;
         }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(video);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+
+        // 2. FIXED FRAME-RATE & HIGH BITRATE SETTINGS
+        const targetFPS = selectedMethod === 'fps' ? 120 : 60;
+        const canvasStream = canvas.captureStream(targetFPS);
+
+        const combinedStream = new MediaStream([
+            ...canvasStream.getVideoTracks(),
+            ...dest.stream.getAudioTracks()
+        ]);
+
+        const options = {
+            videoBitsPerSecond: 45000000, // 45 Mbps High Fidelity
+            audioBitsPerSecond: 320000   // 320 kbps Studio Audio
+        };
+
+        if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
+            options.mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+        } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+            options.mimeType = 'video/mp4';
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+            options.mimeType = 'video/webm;codecs=vp9,opus';
+        }
+
+        const recorder = new MediaRecorder(combinedStream, options);
+        const chunks = [];
+
+        recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+            const finalBlob = new Blob(chunks, { type: options.mimeType || 'video/mp4' });
+            const videoUrl = URL.createObjectURL(finalBlob);
+
+            statusText.textContent = "COMPLETE";
+            percentageText.innerHTML = `100.0<span class="text-cyan-400 text-lg">%</span>`;
+            progressBar.style.width = `100%`;
+
+            outputPlaceholder.classList.add('hidden');
+            downloadLink.href = videoUrl;
+            downloadLink.download = `patched_${selectedFile.name.split('.')[0]}_60fps.mp4`;
+            downloadLink.classList.remove('hidden');
+
+            btnText.textContent = "FINISHED";
+            pulseRing.classList.add('hidden');
+
+            audioCtx.close();
+            if (typeof incrementRenderCount === "function") {
+                incrementRenderCount();
+            }
+        };
+
+        // 3. START RECORDING & RENDER LOOP
+        recorder.start();
+        await video.play();
+
+        const duration = video.duration || 1;
+        const frameInterval = 1000 / targetFPS;
+        let lastFrameTime = performance.now();
+
+        function renderLoop() {
+            if (video.paused || video.ended) {
+                setTimeout(() => { recorder.stop(); }, 200);
+                return;
+            }
+
+            const now = performance.now();
+            const elapsed = now - lastFrameTime;
+
+            if (elapsed >= frameInterval) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                lastFrameTime = now - (elapsed % frameInterval);
+
+                const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+                percentageText.innerHTML = `${pct}.0<span class="text-cyan-400 text-lg">%</span>`;
+                progressBar.style.width = `${pct}%`;
+            }
+            
+            requestAnimationFrame(renderLoop);
+        }
+        
+        requestAnimationFrame(renderLoop);
+
+    } catch (err) {
+        console.error("Render Failure:", err);
+        statusText.textContent = "RENDER ERROR";
+        statusText.className = "text-xs font-bold text-red-500 mono";
+        btnText.textContent = "FAILED";
+        pulseRing.classList.add('hidden');
+    }
+});
 
 
         // 4. MimeType & High Bitrate Setup (টিকটকের জন্য অপ্টিমাইজড)
