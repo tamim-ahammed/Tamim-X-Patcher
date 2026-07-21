@@ -71,14 +71,6 @@
         box-shadow: 0 15px 35px rgba(245, 158, 11, 0.08);
     }
 
-    /* Custom Shimmering & Animations */
-    @keyframes neonPulse {
-        0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8)); }
-        50% { opacity: 0.4; filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)); }
-    }
-
-    .neon-pulse { animation: neonPulse 3s infinite ease-in-out; }
-
     .glow-button {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
@@ -89,9 +81,35 @@
         transform: scale(1.02);
     }
 
-    /* Custom Progress Bar */
     .progress-glow {
         box-shadow: 0 0 15px #06b6d4;
+    }
+
+    /* NEW CYBER-ORBIT LOADING ANIMATIONS */
+    @keyframes orbitSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes orbitSpinReverse {
+        0% { transform: rotate(360deg); }
+        100% { transform: rotate(0deg); }
+    }
+    @keyframes corePulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8)); }
+        50% { transform: scale(1.06); filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.9)); }
+    }
+    @keyframes scanGrid {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 50px; }
+    }
+
+    .animate-orbit { animation: orbitSpin 8s linear infinite; }
+    .animate-orbit-reverse { animation: orbitSpinReverse 5s linear infinite; }
+    .animate-core { animation: corePulse 2.5s ease-in-out infinite; }
+    .bg-cyber-grid {
+        background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 0);
+        background-size: 24px 24px;
+        animation: scanGrid 12s linear infinite;
     }
     </style>
 </head>
@@ -107,34 +125,55 @@
         </div>
         <div class="text-left">
             <p class="text-[9px] text-slate-400 font-mono tracking-wider uppercase">SUPPORT / COMMUNITY</p>
-            <p class="text-xs font-bold text-sky-400 group-hover:underline">@tamim_exee</p>
         </div>
     </a>
 
-    <!-- PREMIUM INTRO SCREEN -->
-    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030712] flex flex-col items-center justify-center transition-all duration-700">
-        <div class="text-center space-y-6 px-4 max-w-md w-full">
-            <div class="relative inline-block">
-                <div class="absolute -inset-4 bg-gradient-to-r from-red-600 via-amber-500 to-cyan-500 rounded-full blur-2xl opacity-50 neon-pulse"></div>
-                <div class="relative w-28 h-28 mx-auto rounded-3xl bg-slate-950 p-1 border border-white/20 shadow-2xl">
-                    <img src="https://cdn5.telesco.pe/file/ixuOhkd2eaFmLNOMUuoLsd3V2IUd7aV_Gxwg6ayyHplLGbZWU3qoxmmUtqwXQzKNH1HPmqS7Dv0lXzFr0jQ2SK3mKBWYAQqCI5t9aCRafvCX84Wlw5SrD3nLGQFIpDW4MlRRW1WfxZI6lzyz2WJ-hxM8Yazdc-2aDKCzD8Fk53wXZRrTYybyoHbLETUEfFH0QpI7_dnpvb8LhyX3eDHRa9s6SJxbILu0Y80-O8zTvpTgm3-LmIZ6MRYgNj9jorw4UBEn3tdXGQqnyMMCXU-O7sX1o_t0RL5Zjy2zDnZjzKdTXQgJnwwIx2ySKAGj3JGw47ItCZoZeZ4L3hlOwpTKhg.jpg" alt="Tamim" class="w-full h-full object-cover rounded-[20px]" onerror="this.src='https://via.placeholder.com/100?text=TAMIM'">
+    <!-- NEW HIGH-END CYBER LOADING SCREEN -->
+    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030712] flex flex-col items-center justify-center transition-all duration-1000 bg-cyber-grid px-4">
+        
+        <!-- Background Lighting Flare -->
+        <div class="absolute w-[350px] h-[350px] bg-gradient-to-tr from-red-600/20 via-amber-500/10 to-cyan-500/20 rounded-full blur-[90px] pointer-events-none"></div>
+
+        <div class="text-center space-y-8 max-w-md w-full relative z-10">
+            
+            <!-- Avatar with Futuristic Orbital Rings -->
+            <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+                <!-- Outer Orbit Ring -->
+                <div class="absolute inset-0 rounded-full border-2 border-dashed border-red-500/40 animate-orbit"></div>
+                <!-- Inner Reverse Orbit Ring -->
+                <div class="absolute inset-2 rounded-full border border-cyan-400/50 border-t-transparent border-b-transparent animate-orbit-reverse"></div>
+                
+                <!-- Center Core Avatar -->
+                <div class="relative w-24 h-24 rounded-2xl bg-slate-950 p-1 border border-white/20 shadow-2xl animate-core overflow-hidden">
+                    <img src="https://cdn5.telesco.pe/file/odOuQ284lzZAu7-C_Gm90S14Iafl8HhCdZ_9zzZHfFNhwinT_JTaKkQOfszukoCnQqDq9DbLuPgm7q4OiXDFp-EILKuI9B-kh59btqimUwTeICCKNAM4BpMisieZhrcDFH-tUHVNKS6IzFNJpXbkVdSvVmUKr9LoA5W4sMJauUfvfLMk7Hz6YAyqQsfOE3vIKEWDxEFNuSZ1HRJpJeLXTkk42VKXIl4EFMjyo7m9RPgQgph4NLhjVwr2nx9O6--AEQqN7bqBR5raHhYYQ-jThDQvG9IqL0G_cOfCmVN8hcMh7NpiYcznUCp05YDr-KVkPgw6xjNtsZPxklHqyVG0-A.jpg" 
+                         alt="Tamim" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://via.placeholder.com/100?text=TAMIM'">
                 </div>
             </div>
 
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-wider text-white">TAMIM X <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-400">PATCHER PRO</span></h1>
-                <p id="loading-status-text" class="text-xs text-cyan-400 mono tracking-widest mt-2">INITIALIZING 60FPS ENGINE...</p>
+            <!-- Title & Status -->
+            <div class="space-y-1">
+                <h1 class="text-3xl font-black tracking-widest text-white uppercase drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+                    TAMIM X <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-amber-400 to-cyan-400">PATCHER</span>
+                </h1>
+                <p id="loading-status-text" class="text-[11px] text-cyan-400 mono tracking-[0.25em] font-bold uppercase animate-pulse">
+                    LOADING 60FPS WASM CORE...
+                </p>
             </div>
 
-            <div class="space-y-2">
-                <div class="w-full bg-slate-900/80 h-2 rounded-full p-0.5 border border-white/10 overflow-hidden">
-                    <div id="intro-bar" class="bg-gradient-to-r from-red-500 via-amber-400 to-cyan-400 h-full w-0 rounded-full transition-all duration-200"></div>
+            <!-- Modern Progress Meter -->
+            <div class="space-y-2.5 glass-panel p-4 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="flex justify-between items-center text-xs font-mono font-bold">
+                    <span class="text-slate-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> ENGINE LOAD
+                    </span>
+                    <span id="intro-percent" class="text-cyan-400">0%</span>
                 </div>
-                <div class="flex justify-between text-[11px] mono text-slate-500">
-                    <span>ENGINE STATUS</span>
-                    <span id="intro-percent" class="text-white">0%</span>
+
+                <div class="w-full bg-slate-950 h-2.5 rounded-full p-0.5 border border-white/10 overflow-hidden relative">
+                    <div id="intro-bar" class="bg-gradient-to-r from-red-500 via-amber-400 to-cyan-400 h-full w-0 rounded-full transition-all duration-300 shadow-[0_0_15px_#06b6d4]"></div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -145,7 +184,7 @@
         <header class="flex items-center justify-between pb-6 border-b border-white/10 mb-8 glass-panel px-6 py-4 rounded-2xl">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl overflow-hidden border border-red-500/50 p-0.5 bg-black">
-                    <img src="https://cdn5.telesco.pe/file/ixuOhkd2eaFmLNOMUuoLsd3V2IUd7aV_Gxwg6ayyHplLGbZWU3qoxmmUtqwXQzKNH1HPmqS7Dv0lXzFr0jQ2SK3mKBWYAQqCI5t9aCRafvCX84Wlw5SrD3nLGQFIpDW4MlRRW1WfxZI6lzyz2WJ-hxM8Yazdc-2aDKCzD8Fk53wXZRrTYybyoHbLETUEfFH0QpI7_dnpvb8LhyX3eDHRa9s6SJxbILu0Y80-O8zTvpTgm3-LmIZ6MRYgNj9jorw4UBEn3tdXGQqnyMMCXU-O7sX1o_t0RL5Zjy2zDnZjzKdTXQgJnwwIx2ySKAGj3JGw47ItCZoZeZ4L3hlOwpTKhg.jpg" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/40?text=T'">
+                    <img src="https://cdn5.telesco.pe/file/odOuQ284lzZAu7-C_Gm90S14Iafl8HhCdZ_9zzZHfFNhwinT_JTaKkQOfszukoCnQqDq9DbLuPgm7q4OiXDFp-EILKuI9B-kh59btqimUwTeICCKNAM4BpMisieZhrcDFH-tUHVNKS6IzFNJpXbkVdSvVmUKr9LoA5W4sMJauUfvfLMk7Hz6YAyqQsfOE3vIKEWDxEFNuSZ1HRJpJeLXTkk42VKXIl4EFMjyo7m9RPgQgph4NLhjVwr2nx9O6--AEQqN7bqBR5raHhYYQ-jThDQvG9IqL0G_cOfCmVN8hcMh7NpiYcznUCp05YDr-KVkPgw6xjNtsZPxklHqyVG0-A.jpg" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/40?text=T'">
                 </div>
                 <div>
                     <h2 class="text-lg font-extrabold tracking-wider text-white leading-none">TAMIM X <span class="text-red-500">PATCHER</span></h2>
@@ -228,7 +267,7 @@
                             <span id="badge-fps" class="text-[9px] font-mono text-cyan-400 font-bold px-2 py-0.5 rounded-full bg-cyan-500/20">ACTIVE</span>
                         </div>
                         <h4 class="font-bold text-white text-sm">Patcher 60FPS Lock</h4>
-                        <p class="text-[11px] text-slate-400 font-mono mt-1">Forces Constant 60 FPS + Fixed Audio Bitrate (itzCrih Method)</p>
+                        <p class="text-[11px] text-slate-400 font-mono mt-1">Forces Constant 60 FPS + Fixed Audio Bitrate (Exee Method)</p>
                     </div>
 
                     <div id="method-hybrid" onclick="selectMethod('hybrid')" 
@@ -314,7 +353,7 @@
         }
         animateParticles();
 
-        // 2. FFMPEG INITIALIZATION
+        // 2. FFMPEG INITIALIZATION WITH NEW INTRO ANIMATION
         const { createFFmpeg, fetchFile } = FFmpeg;
         const ffmpeg = createFFmpeg({ log: false });
 
@@ -339,8 +378,8 @@
                     setTimeout(() => {
                         introScreen.style.display = 'none';
                         appContent.classList.remove('opacity-0');
-                    }, 500);
-                }, 300);
+                    }, 600);
+                }, 400);
             } catch (err) {
                 console.error("FFmpeg load failed:", err);
                 clearInterval(timer);
