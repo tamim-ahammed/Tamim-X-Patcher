@@ -545,7 +545,7 @@
         }
 
         
-// 7. ULTRA-FAST FETCH & INSTANT DOWNLOAD ENGINE (NO LOADER DELAY)
+// 7. ULTRA-FAST FETCH & REAL FILE DOWNLOAD ENGINE
 let directVideoUrl = null;
 
 async function downloadTikTokVideo() {
@@ -569,13 +569,14 @@ async function downloadTikTokVideo() {
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
     try {
+        // Fast JSON Fetching
         const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const data = await apiRes.json();
 
         if (data?.data?.play) {
             let rawPlay = data.data.play;
 
-            // Direct Download Proxy URL Construction
+            // Proper URL Construction
             if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
                 directVideoUrl = rawPlay;
             } else if (rawPlay.startsWith('//')) {
@@ -607,16 +608,16 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Zero-Delay Direct Save Trigger
+// Direct File Force Download Proxy (Fixes JSON Screen Bug)
 function saveTikTokFileToDevice() {
     if (!directVideoUrl) return;
 
-    // TikWM Proxy Attachment Link to Force Direct Download without waiting
-    const directDownloadLink = `https://www.tikwm.com/api/?url=${encodeURIComponent(document.getElementById('dl-url-input').value.trim())}&dl=1`;
+    // Direct TikWM download proxy stream that forces video/mp4 headers
+    const proxyDownloadUrl = `https://www.tikwm.com/download.php?url=${encodeURIComponent(directVideoUrl)}`;
     
     const a = document.createElement('a');
-    a.href = directDownloadLink;
-    a.rel = 'noopener noreferrer';
+    a.href = proxyDownloadUrl;
+    a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
