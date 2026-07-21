@@ -198,49 +198,49 @@
         <div class="grid grid-cols-2 gap-4 mb-8">
             <div class="glass-panel p-4 rounded-2xl text-center">
                 <p class="text-[10px] text-slate-400 mono uppercase tracking-wider">TOTAL VISITORS</p>
-                <p id="visitor-count" class="text-2xl font-bold text-cyan-400 mono mt-1">109</p>
+                <p id="visitor-count" class="text-2xl font-bold text-cyan-400 mono mt-1">0</p>
             </div>
             <div class="glass-panel p-4 rounded-2xl text-center">
                 <p class="text-[10px] text-slate-400 mono uppercase tracking-wider">PATCHED CLIPS</p>
-                <p id="render-count" class="text-2xl font-bold text-red-500 mono mt-1">47</p>
+                <p id="render-count" class="text-2xl font-bold text-red-500 mono mt-1">0</p>
             </div>
         </div>
 
         <!-- TIMELINE STEPS -->
         <div class="space-y-8">
 
-           <!-- STEP 00: FAST TIKTOK BOT UI -->
-<div class="glass-panel gold-glow-card p-6 rounded-3xl relative overflow-hidden transition-all hover:border-amber-400/60 duration-500 group">
-    <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-500/15 rounded-full blur-2xl group-hover:scale-150 transition-all duration-700 pointer-events-none"></div>
+            <!-- STEP 00: FAST TIKTOK BOT UI -->
+            <div class="glass-panel gold-glow-card p-6 rounded-3xl relative overflow-hidden transition-all hover:border-amber-400/60 duration-500 group">
+                <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-500/15 rounded-full blur-2xl group-hover:scale-150 transition-all duration-700 pointer-events-none"></div>
 
-    <div class="flex items-center justify-between mb-4 relative z-10">
-        <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 font-mono text-xs font-bold rounded-lg border border-amber-500/30 animate-pulse">00</span>
-            <h3 class="font-bold text-amber-100 text-sm tracking-wide">TikTok Downloader (Fast Engine)</h3>
-        </div>
-        <span class="text-[10px] font-mono text-amber-400/80 tracking-widest uppercase">ULTRA HD</span>
-    </div>
+                <div class="flex items-center justify-between mb-4 relative z-10">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 font-mono text-xs font-bold rounded-lg border border-amber-500/30 animate-pulse">00</span>
+                        <h3 class="font-bold text-amber-100 text-sm tracking-wide">TikTok Downloader (Fast Engine)</h3>
+                    </div>
+                    <span class="text-[10px] font-mono text-amber-400/80 tracking-widest uppercase">ULTRA HD</span>
+                </div>
 
-    <div class="space-y-3 relative z-10">
-        <div class="flex gap-2">
-            <input type="text" id="dl-url-input" placeholder="Paste TikTok Link..." 
-                   class="w-full bg-slate-950/80 border border-amber-500/30 focus:border-amber-400 rounded-xl px-4 py-3 text-xs text-amber-100 placeholder-slate-500 focus:outline-none font-mono transition-all">
-            <button id="dl-btn" onclick="downloadTikTokVideo()" 
-                    class="bg-gradient-to-r from-amber-500 to-orange-600 hover:brightness-110 active:scale-95 font-black px-5 rounded-xl text-xs text-slate-950 uppercase font-mono transition-all shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
-                FETCH ⚡
-            </button>
-        </div>
+                <div class="space-y-3 relative z-10">
+                    <div class="flex gap-2">
+                        <input type="text" id="dl-url-input" placeholder="Paste TikTok Link..." 
+                               class="w-full bg-slate-950/80 border border-amber-500/30 focus:border-amber-400 rounded-xl px-4 py-3 text-xs text-amber-100 placeholder-slate-500 focus:outline-none font-mono transition-all">
+                        <button id="dl-btn" onclick="downloadTikTokVideo()" 
+                                class="bg-gradient-to-r from-amber-500 to-orange-600 hover:brightness-110 active:scale-95 font-black px-5 rounded-xl text-xs text-slate-950 uppercase font-mono transition-all shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+                            FETCH ⚡
+                        </button>
+                    </div>
 
-        <div id="dl-status" class="text-xs font-mono hidden transition-all duration-300"></div>
+                    <div id="dl-status" class="text-xs font-mono hidden transition-all duration-300"></div>
 
-        <div id="dl-result" class="hidden transition-all duration-300 transform scale-95 opacity-0">
-            <button id="tiktok-save-btn" onclick="saveTikTokFileToDevice()"
-                    class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:brightness-110 active:scale-95 text-slate-950 font-black py-3.5 rounded-xl text-xs font-mono uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
-                <span>⬇️ SAVE VIDEO TO DEVICE</span>
-            </button>
-        </div>
-    </div>
-</div>
+                    <div id="dl-result" class="hidden transition-all duration-300 transform scale-95 opacity-0">
+                        <button id="tiktok-save-btn" onclick="saveTikTokFileToDevice()"
+                                class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:brightness-110 active:scale-95 text-slate-950 font-black py-3.5 rounded-xl text-xs font-mono uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
+                            <span>⬇️ SAVE VIDEO TO DEVICE</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
             
             <!-- STEP 01: FILE UPLOAD -->
             <div class="glass-panel p-6 rounded-3xl space-y-4">
@@ -358,47 +358,47 @@
         }
         animateParticles();
 
-       // FAST INTRO LOADING SCREEN (EXACTLY 1.5 SECONDS)
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: false });
+        // 2. FAST INTRO LOADING SCREEN (EXACTLY 1.5 SECONDS)
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        const ffmpeg = createFFmpeg({ log: false });
 
-window.addEventListener('DOMContentLoaded', async () => {
-    const introBar = document.getElementById('intro-bar');
-    const introPercent = document.getElementById('intro-percent');
-    const introScreen = document.getElementById('intro-screen');
-    const appContent = document.getElementById('app-content');
+        window.addEventListener('DOMContentLoaded', async () => {
+            const introBar = document.getElementById('intro-bar');
+            const introPercent = document.getElementById('intro-percent');
+            const introScreen = document.getElementById('intro-screen');
+            const appContent = document.getElementById('app-content');
 
-    let progress = 0;
-    const duration = 1500; // ঠিক ১.৫ সেকেন্ড
-    const intervalTime = 20; 
-    const increment = 100 / (duration / intervalTime);
+            let progress = 0;
+            const duration = 1500; // ঠিক ১.৫ সেকেন্ড
+            const intervalTime = 20; 
+            const increment = 100 / (duration / intervalTime);
 
-    const timer = setInterval(() => {
-        progress += increment;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(timer);
-        }
-        if(introBar) introBar.style.width = Math.floor(progress) + '%';
-        if(introPercent) introPercent.textContent = Math.floor(progress) + '%';
-    }, intervalTime);
+            const timer = setInterval(() => {
+                progress += increment;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(timer);
+                }
+                if(introBar) introBar.style.width = Math.floor(progress) + '%';
+                if(introPercent) introPercent.textContent = Math.floor(progress) + '%';
+            }, intervalTime);
 
-    const ffmpegPromise = ffmpeg.load().catch(err => console.error("FFmpeg Load Error:", err));
+            const ffmpegPromise = ffmpeg.load().catch(err => console.error("FFmpeg Load Error:", err));
 
-    setTimeout(async () => {
-        await ffmpegPromise;
-        if(introScreen) {
-            introScreen.style.opacity = '0';
-            setTimeout(() => {
-                introScreen.style.display = 'none';
-                if(appContent) appContent.classList.remove('opacity-0');
-            }, 400);
-        }
-    }, duration);
+            setTimeout(async () => {
+                await ffmpegPromise;
+                if(introScreen) {
+                    introScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        introScreen.style.display = 'none';
+                        if(appContent) appContent.classList.remove('opacity-0');
+                    }, 400);
+                }
+            }, duration);
 
-    // Initialize Counters
-    initLiveVisitors();
-});
+            // Initialize Counters
+            initLiveVisitors();
+        });
         
         // 3. METHOD TOGGLE
         let activeMethod = 'fps';
@@ -503,184 +503,110 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // REALTIME LIVE VISITOR COUNTER (STARTS FROM 0 & UPDATES LIVE)
-const APP_KEY = "tamim_studio_counter_v6";
+        // 6. REALTIME LIVE VISITOR COUNTER (STARTS FROM 0 & UPDATES LIVE)
+        const APP_KEY = "tamim_studio_counter_v6";
 
-function initLiveVisitors() {
-    let currentVisitors = parseInt(localStorage.getItem(APP_KEY + '_v')) || 0;
-    
-    // ১ম বার ভিজিট করলে ১ থেকে কাউন্ট স্টার্ট হবে
-    if (!sessionStorage.getItem('v_recorded')) {
-        currentVisitors += 1;
-        localStorage.setItem(APP_KEY + '_v', currentVisitors);
-        sessionStorage.setItem('v_recorded', 'true');
-    }
+        function initLiveVisitors() {
+            let currentVisitors = parseInt(localStorage.getItem(APP_KEY + '_v')) || 0;
+            
+            // ১ম বার ভিজিট করলে ১ থেকে কাউন্ট স্টার্ট হবে
+            if (!sessionStorage.getItem('v_recorded')) {
+                currentVisitors += 1;
+                localStorage.setItem(APP_KEY + '_v', currentVisitors);
+                sessionStorage.setItem('v_recorded', 'true');
+            }
 
-    const visitorElem = document.getElementById('visitor-count');
-    const renderElem = document.getElementById('render-count');
+            const visitorElem = document.getElementById('visitor-count');
+            const renderElem = document.getElementById('render-count');
 
-    if(visitorElem) visitorElem.textContent = currentVisitors;
-    if(renderElem) renderElem.textContent = parseInt(localStorage.getItem(APP_KEY + '_r')) || 0;
+            if(visitorElem) visitorElem.textContent = currentVisitors;
+            if(renderElem) renderElem.textContent = parseInt(localStorage.getItem(APP_KEY + '_r')) || 0;
 
-    // লাইভ ভিজিটর আপডেট (লাইভ ইউজার ট্র্যাকিং অ্যানিমেশন)
-    setInterval(() => {
-        if (Math.random() > 0.4) {
-            currentVisitors += Math.floor(Math.random() * 2) + 1;
-            localStorage.setItem(APP_KEY + '_v', currentVisitors);
-            if(visitorElem) {
-                visitorElem.textContent = currentVisitors;
-                visitorElem.classList.add('animate-pulse', 'text-emerald-400');
-                setTimeout(() => visitorElem.classList.remove('animate-pulse', 'text-emerald-400'), 1000);
+            // লাইভ ভিজিটর আপডেট (লাইভ ইউজার ট্র্যাকিং অ্যানিমেশন)
+            setInterval(() => {
+                if (Math.random() > 0.4) {
+                    currentVisitors += Math.floor(Math.random() * 2) + 1;
+                    localStorage.setItem(APP_KEY + '_v', currentVisitors);
+                    if(visitorElem) {
+                        visitorElem.textContent = currentVisitors;
+                        visitorElem.classList.add('animate-pulse', 'text-emerald-400');
+                        setTimeout(() => visitorElem.classList.remove('animate-pulse', 'text-emerald-400'), 1000);
+                    }
+                }
+            }, 4000);
+        }
+
+        function incrementRenderCount() {
+            let currentRenders = parseInt(localStorage.getItem(APP_KEY + '_r')) || 0;
+            currentRenders += 1;
+            localStorage.setItem(APP_KEY + '_r', currentRenders);
+            const renderElem = document.getElementById('render-count');
+            if(renderElem) renderElem.textContent = currentRenders;
+        }
+
+        // 7. ULTRA-FAST TIKTOK FETCH ENGINE
+        let directVideoUrl = null;
+
+        async function downloadTikTokVideo() {
+            const urlInput = document.getElementById('dl-url-input');
+            const url = urlInput.value.trim();
+            const status = document.getElementById('dl-status');
+            const resContainer = document.getElementById('dl-result');
+            const fetchBtn = document.getElementById('dl-btn');
+
+            if (!url) {
+                alert("Please paste a valid TikTok link!");
+                return;
+            }
+
+            fetchBtn.disabled = true;
+            fetchBtn.classList.add('opacity-50');
+            status.classList.remove('hidden');
+            status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FAST FETCHING...</span>`;
+            status.className = "text-xs text-amber-400 font-mono font-bold";
+            
+            resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
+
+            try {
+                const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+                const data = await apiRes.json();
+
+                if (data?.data?.play) {
+                    directVideoUrl = data.data.play;
+
+                    status.innerHTML = "⚡ READY TO DOWNLOAD!";
+                    status.className = "text-xs text-emerald-400 font-mono font-bold";
+                    
+                    resContainer.classList.remove('hidden');
+                    setTimeout(() => {
+                        resContainer.classList.remove('scale-95', 'opacity-0');
+                        resContainer.classList.add('scale-100', 'opacity-100');
+                    }, 50);
+
+                } else {
+                    throw new Error();
+                }
+
+            } catch (err) {
+                status.innerHTML = "❌ FETCH FAILED! PLEASE RE-PASTE LINK.";
+                status.className = "text-xs text-red-500 font-mono font-bold";
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.classList.remove('opacity-50');
             }
         }
-    }, 4000);
-}
 
-function incrementRenderCount() {
-    let currentRenders = parseInt(localStorage.getItem(APP_KEY + '_r')) || 0;
-    currentRenders += 1;
-    localStorage.setItem(APP_KEY + '_r', currentRenders);
-    const renderElem = document.getElementById('render-count');
-    if(renderElem) renderElem.textContent = currentRenders;
-}
-
-
-        
-// ULTRA-FAST TIKTOK FETCH ENGINE (INSTANT API RESPONSE)
-let directVideoUrl = null;
-
-async function downloadTikTokVideo() {
-    const urlInput = document.getElementById('dl-url-input');
-    const url = urlInput.value.trim();
-    const status = document.getElementById('dl-status');
-    const resContainer = document.getElementById('dl-result');
-    const fetchBtn = document.getElementById('dl-btn');
-
-    if (!url) {
-        alert("Please paste a valid TikTok link!");
-        return;
-    }
-
-    fetchBtn.disabled = true;
-    fetchBtn.classList.add('opacity-50');
-    status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FAST FETCHING...</span>`;
-    status.className = "text-xs text-amber-400 font-mono font-bold";
-    
-    resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
-
-    try {
-        const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-        const data = await apiRes.json();
-
-        if (data?.data?.play) {
-            directVideoUrl = data.data.play;
-
-            status.innerHTML = "⚡ READY TO DOWNLOAD!";
-            status.className = "text-xs text-emerald-400 font-mono font-bold";
-            
-            resContainer.classList.remove('hidden');
-            setTimeout(() => {
-                resContainer.classList.remove('scale-95', 'opacity-0');
-                resContainer.classList.add('scale-100', 'opacity-100');
-            }, 50);
-
-        } else {
-            throw new Error();
+        // Direct Save Trigger
+        function saveTikTokFileToDevice() {
+            if (!directVideoUrl) return;
+            const a = document.createElement('a');
+            a.href = directVideoUrl;
+            a.target = "_blank";
+            a.download = `TikTok_Tamim_${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
-
-    } catch (err) {
-        status.innerHTML = "❌ FETCH FAILED! PLEASE RE-PASTE LINK.";
-        status.className = "text-xs text-red-500 font-mono font-bold";
-    } finally {
-        fetchBtn.disabled = false;
-        fetchBtn.classList.remove('opacity-50');
-    }
-}
-
-// Direct Save Trigger
-function saveTikTokFileToDevice() {
-    if (!directVideoUrl) return;
-    const a = document.createElement('a');
-    a.href = directVideoUrl;
-    a.target = "_blank";
-    a.download = `TikTok_Tamim_${Date.now()}.mp4`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-    
-    // UI Reset and Loading Animation
-    fetchBtn.disabled = true;
-    fetchBtn.classList.add('opacity-50');
-    status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span> DOWNLOADING VIDEO FILE...</span>`;
-    status.className = "text-xs text-amber-400 font-mono font-bold";
-    
-    resContainer.classList.add('hidden', 'scale-90', 'opacity-0');
-
-    try {
-        let rawVideoUrl = null;
-
-        // API Fetch Logic
-        try {
-            const api1 = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-            const data1 = await api1.json();
-            if (data1?.data?.play) rawVideoUrl = data1.data.play;
-        } catch (e) {}
-
-        if (!rawVideoUrl) {
-            const api2 = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
-            const data2 = await api2.json();
-            if (data2?.video?.noWatermark) rawVideoUrl = data2.video.noWatermark;
-        }
-
-        if (rawVideoUrl) {
-            // Converts Video into Blob (Forces genuine device file download)
-            const videoResponse = await fetch(rawVideoUrl);
-            const videoBlob = await videoResponse.blob();
-            
-            if (fetchedVideoBlobUrl) URL.revokeObjectURL(fetchedVideoBlobUrl);
-            fetchedVideoBlobUrl = URL.createObjectURL(videoBlob);
-
-            // Status UI Update with Pop-in Animation
-            status.innerHTML = "✅ READY TO SAVE TO DEVICE!";
-            status.className = "text-xs text-emerald-400 font-mono font-bold animate-pulse";
-            
-            resContainer.classList.remove('hidden');
-            setTimeout(() => {
-                resContainer.classList.remove('scale-90', 'opacity-0');
-                resContainer.classList.add('scale-100', 'opacity-100');
-            }, 50);
-
-        } else {
-            throw new Error("Unable to fetch video");
-        }
-
-    } catch (err) {
-        console.error(err);
-        status.innerHTML = "❌ FAILED TO DOWNLOAD! CHECK LINK OR TRY AGAIN.";
-        status.className = "text-xs text-red-500 font-mono font-bold";
-    } finally {
-        fetchBtn.disabled = false;
-        fetchBtn.classList.remove('opacity-50');
-    }
-}
-
-// Function to trigger direct device download
-function saveTikTokFileToDevice() {
-    if (!fetchedVideoBlobUrl) return;
-
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.href = fetchedVideoBlobUrl;
-    downloadAnchor.download = `TikTok_Tamim_Patcher_${Date.now()}.mp4`;
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-}
-        
-        
     </script>
 </body>
 </html>
