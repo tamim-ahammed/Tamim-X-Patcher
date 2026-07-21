@@ -543,9 +543,8 @@
             const renderElem = document.getElementById('render-count');
             if(renderElem) renderElem.textContent = currentRenders;
         }
-
-        // 7. ULTRA-FAST & BUG-FIXED TIKTOK DOWNLOAD ENGINE
-let fastDownloadUrl = null;
+// 7. ULTRA-FAST & ACCURATE TIKTOK DOWNLOAD ENGINE
+let directStreamBlobUrl = null;
 
 async function downloadTikTokVideo() {
     const urlInput = document.getElementById('dl-url-input');
@@ -562,7 +561,7 @@ async function downloadTikTokVideo() {
     fetchBtn.disabled = true;
     fetchBtn.classList.add('opacity-50');
     status.classList.remove('hidden');
-    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FETCHING INSTANTLY...</span>`;
+    status.innerHTML = `<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> FAST FETCHING & PROCESSING...</span>`;
     status.className = "text-xs text-amber-400 font-mono font-bold";
     
     resContainer.classList.add('hidden', 'scale-95', 'opacity-0');
@@ -573,17 +572,24 @@ async function downloadTikTokVideo() {
 
         if (data?.data?.play) {
             let rawPlay = data.data.play;
+            let finalVideoUrl = "";
 
-            // URL Syntax Fix (Duplicate Domain Prevention)
             if (rawPlay.startsWith('http://') || rawPlay.startsWith('https://')) {
-                fastDownloadUrl = rawPlay;
+                finalVideoUrl = rawPlay;
             } else if (rawPlay.startsWith('//')) {
-                fastDownloadUrl = `https:${rawPlay}`;
+                finalVideoUrl = `https:${rawPlay}`;
             } else {
-                fastDownloadUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
+                finalVideoUrl = `https://www.tikwm.com${rawPlay.startsWith('/') ? '' : '/'}${rawPlay}`;
             }
 
-            status.innerHTML = "⚡ READY FOR FAST SAVE!";
+            // High-Speed Direct Stream Fetch to Blob (Forces Gallery Save on iOS/Android)
+            const videoStream = await fetch(finalVideoUrl);
+            const videoBlob = await videoStream.blob();
+            
+            if (directStreamBlobUrl) URL.revokeObjectURL(directStreamBlobUrl);
+            directStreamBlobUrl = URL.createObjectURL(videoBlob);
+
+            status.innerHTML = "⚡ FAST READY! SAVE DIRECTLY TO DEVICE";
             status.className = "text-xs text-emerald-400 font-mono font-bold";
             
             resContainer.classList.remove('hidden');
@@ -606,17 +612,16 @@ async function downloadTikTokVideo() {
     }
 }
 
-// Direct Instant Save Trigger
+// Direct Instant Device Save Trigger
 function saveTikTokFileToDevice() {
-    if (!fastDownloadUrl) return;
+    if (!directStreamBlobUrl) return;
     
-    const a = document.createElement('a');
-    a.href = fastDownloadUrl;
-    a.target = '_blank';
-    a.setAttribute('download', `TikTok_Tamim_${Date.now()}.mp4`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = directStreamBlobUrl;
+    downloadAnchor.download = `TikTok_Tamim_${Date.now()}.mp4`;
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
 }
         
     </script>
